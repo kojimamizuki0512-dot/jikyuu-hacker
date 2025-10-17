@@ -1,87 +1,169 @@
-<!DOCTYPE html>
-<html>
+<!doctype html>
+<html lang="ja">
   <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Welcome to Firebase Hosting</title>
-
-    <!-- update the version number as needed -->
-    <script defer src="/__/firebase/12.4.0/firebase-app-compat.js"></script>
-    <!-- include only the Firebase features as you need -->
-    <script defer src="/__/firebase/12.4.0/firebase-auth-compat.js"></script>
-    <script defer src="/__/firebase/12.4.0/firebase-database-compat.js"></script>
-    <script defer src="/__/firebase/12.4.0/firebase-firestore-compat.js"></script>
-    <script defer src="/__/firebase/12.4.0/firebase-functions-compat.js"></script>
-    <script defer src="/__/firebase/12.4.0/firebase-messaging-compat.js"></script>
-    <script defer src="/__/firebase/12.4.0/firebase-storage-compat.js"></script>
-    <script defer src="/__/firebase/12.4.0/firebase-analytics-compat.js"></script>
-    <script defer src="/__/firebase/12.4.0/firebase-remote-config-compat.js"></script>
-    <script defer src="/__/firebase/12.4.0/firebase-performance-compat.js"></script>
-    <!-- 
-      initialize the SDK after all desired features are loaded, set useEmulator to false
-      to avoid connecting the SDK to running emulators.
-    -->
-    <script defer src="/__/firebase/init.js?useEmulator=true"></script>
-
-    <style media="screen">
-      body { background: #ECEFF1; color: rgba(0,0,0,0.87); font-family: Roboto, Helvetica, Arial, sans-serif; margin: 0; padding: 0; }
-      #message { background: white; max-width: 360px; margin: 100px auto 16px; padding: 32px 24px; border-radius: 3px; }
-      #message h2 { color: #ffa100; font-weight: bold; font-size: 16px; margin: 0 0 8px; }
-      #message h1 { font-size: 22px; font-weight: 300; color: rgba(0,0,0,0.6); margin: 0 0 16px;}
-      #message p { line-height: 140%; margin: 16px 0 24px; font-size: 14px; }
-      #message a { display: block; text-align: center; background: #039be5; text-transform: uppercase; text-decoration: none; color: white; padding: 16px; border-radius: 4px; }
-      #message, #message a { box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24); }
-      #load { color: rgba(0,0,0,0.4); text-align: center; font-size: 13px; }
-      @media (max-width: 600px) {
-        body, #message { margin-top: 0; background: white; box-shadow: none; }
-        body { border-top: 16px solid #ffa100; }
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>時給ハッカー | コックピット（スモーク）</title>
+    <style>
+      :root{
+        --bg:#0f1213;           /* 深いダーク */
+        --panel:#151a1b;        /* パネル面 */
+        --muted:#a8b3ad;        /* サブ文字 */
+        --text:#e9f2ee;         /* 主要文字 */
+        --accent:#2aa676;       /* エメラルド */
+        --accent-weak:#1c6d4e;  /* ホバー等 */
+        --danger:#ff5a5f;
+        --radius:14px;          /* 角丸トークン */
+        --shadow:0 8px 24px rgba(0,0,0,.35);
       }
+      html,body{height:100%}
+      body{
+        margin:0; font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans JP", sans-serif;
+        background: radial-gradient(1200px 800px at 70% -10%, rgba(42,166,118,.15), transparent 60%) , var(--bg);
+        color:var(--text); display:grid; place-items:center;
+      }
+      .card{
+        width:min(720px, 92vw); background:linear-gradient(180deg, rgba(255,255,255,.02), rgba(255,255,255,.00));
+        border:1px solid rgba(255,255,255,.06); border-radius:var(--radius); box-shadow:var(--shadow); padding:28px;
+      }
+      .row{display:flex; gap:16px; align-items:center; flex-wrap:wrap}
+      .grow{flex:1}
+      h1{margin:0 0 4px 0; font-size:22px; letter-spacing:.2px}
+      .muted{color:var(--muted); font-size:13px}
+      button{
+        appearance:none; border:none; border-radius:12px; padding:12px 16px; font-weight:600; cursor:pointer;
+        background:var(--accent); color:#081b14; transition:.2s transform ease, .2s background;
+      }
+      button:hover{ background:var(--accent-weak); color:#dff6ee }
+      button.ghost{ background:transparent; color:var(--text); border:1px solid rgba(255,255,255,.12) }
+      .grid{display:grid; grid-template-columns:repeat(3, 1fr); gap:12px; margin-top:16px}
+      .stat{background:var(--panel); border:1px solid rgba(255,255,255,.06); border-radius:12px; padding:14px}
+      .stat .label{color:var(--muted); font-size:12px}
+      .stat .val{font-size:20px; font-weight:700; margin-top:6px}
+      .map{
+        height:260px; border-radius:12px; margin-top:16px; background:
+          linear-gradient(0deg, rgba(42,166,118,.10), rgba(42,166,118,.06)),
+          url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="640" height="320"><rect width="100%" height="100%" fill="%23151a1b"/><g stroke="%23242a2b" stroke-width="1" opacity=".9"><path d="M0 40 H640 M0 80 H640 M0 120 H640 M0 160 H640 M0 200 H640 M0 240 H640 M0 280 H640"/><path d="M80 0 V320 M160 0 V320 M240 0 V320 M320 0 V320 M400 0 V320 M480 0 V320 M560 0 V320"/></g><circle cx="360" cy="160" r="48" fill="url(%23g)"/></svg>');
+        display:grid; place-items:center; color:var(--muted);
+      }
+      .footer{margin-top:18px; color:var(--muted); font-size:12px; text-align:center}
+      .rowbtn{display:flex; gap:10px; margin-top:14px; flex-wrap:wrap}
+      .tag{background:rgba(42,166,118,.12); color:#c8f1e3; border:1px solid rgba(42,166,118,.35); padding:6px 10px; border-radius:999px; font-size:12px}
+      a{color:#7adbb5; text-decoration:none}
+      a:hover{text-decoration:underline}
+      .hidden{display:none}
     </style>
   </head>
   <body>
-    <div id="message">
-      <h2>Welcome</h2>
-      <h1>Firebase Hosting Setup Complete</h1>
-      <p>You're seeing this because you've successfully setup Firebase Hosting. Now it's time to go build something extraordinary!</p>
-      <a target="_blank" href="https://firebase.google.com/docs/hosting/">Open Hosting Documentation</a>
+    <div class="card">
+      <div class="row">
+        <div class="grow">
+          <h1>時給ハッカー — コックピット（スモーク）</h1>
+          <div class="muted">Googleでログイン→仮コックピット表示。ここでは計測・DB書き込みはまだ行いません。</div>
+        </div>
+        <div>
+          <button id="signinBtn">Googleでログイン</button>
+          <button id="signoutBtn" class="ghost hidden">ログアウト</button>
+        </div>
+      </div>
+
+      <div id="authed" class="hidden">
+        <div class="row" style="margin-top:14px">
+          <img id="avatar" src="" alt="" style="width:40px;height:40px;border-radius:50%;border:1px solid rgba(255,255,255,.15)">
+          <div class="grow">
+            <div id="username" style="font-weight:700"></div>
+            <div class="muted" id="email"></div>
+          </div>
+          <span class="tag">v0 スモーク</span>
+        </div>
+
+        <div class="grid">
+          <div class="stat"><div class="label">現在の時給（仮）</div><div class="val" id="wage">¥0</div></div>
+          <div class="stat"><div class="label">今日の件数（仮）</div><div class="val" id="orders">0</div></div>
+          <div class="stat"><div class="label">稼働時間（仮）</div><div class="val" id="time">0:00</div></div>
+        </div>
+
+        <div class="rowbtn">
+          <button id="startBtn">開始</button>
+          <button id="pauseBtn" class="ghost">一時停止</button>
+          <button id="stopBtn" class="ghost">終了</button>
+        </div>
+
+        <div class="map">（ここにGoogleマップを統合予定／現在はダミー表示）</div>
+      </div>
+
+      <div id="unauthed" style="margin-top:18px" class="muted">
+        ログインすると、ここにコックピットが表示されます。
+      </div>
+
+      <div class="footer">© Jikyuu Hacker</div>
     </div>
-    <p id="load">Firebase SDK Loading&hellip;</p>
 
-    <script>
-      document.addEventListener('DOMContentLoaded', function() {
-        const loadEl = document.querySelector('#load');
-        // // 🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥
-        // // The Firebase SDK is initialized and available here!
-        //
-        // firebase.auth().onAuthStateChanged(user => { });
-        // firebase.database().ref('/path/to/ref').on('value', snapshot => { });
-        // firebase.firestore().doc('/foo/bar').get().then(() => { });
-        // firebase.functions().httpsCallable('yourFunction')().then(() => { });
-        // firebase.messaging().requestPermission().then(() => { });
-        // firebase.storage().ref('/path/to/ref').getDownloadURL().then(() => { });
-        // firebase.analytics(); // call to activate
-        // firebase.analytics().logEvent('tutorial_completed');
-        // firebase.performance(); // call to activate
-        //
-        // // 🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥
+    <!-- Firebase (Modules via CDN) -->
+    <script type="module">
+      // 1) ここを Firebase コンソールの「ウェブアプリ設定」の値で置き換える
+      const firebaseConfig = {
+        apiKey: "AIzaSyA8x75S7gx0vF4CtENATZO0Spnn33t_Oyg",
+        authDomain: "jikyuu-hacker.firebaseapp.com",
+        projectId: "jikyuu-hacker",
+        storageBucket: "jikyuu-hacker.firebasestorage.app",
+        messagingSenderId: "141311985365",
+        appId: "1:141311985365:web:41f64d51bcc7737d5c445c",
+        measurementId: "G-B85Q3TRR6V"
+       };
 
-        try {
-          let app = firebase.app();
-          let features = [
-            'auth', 
-            'database', 
-            'firestore',
-            'functions',
-            'messaging', 
-            'storage', 
-            'analytics', 
-            'remoteConfig',
-            'performance',
-          ].filter(feature => typeof app[feature] === 'function');
-          loadEl.textContent = `Firebase SDK loaded with ${features.join(', ')}`;
-        } catch (e) {
-          console.error(e);
-          loadEl.textContent = 'Error loading the Firebase SDK, check the console.';
+
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
+      import {
+        getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged
+      } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
+
+      const app = initializeApp(firebaseConfig);
+      const auth = getAuth(app);
+      auth.languageCode = "ja";
+      const provider = new GoogleAuthProvider();
+
+      const $ = (id)=>document.getElementById(id);
+      const show = (el)=>el.classList.remove("hidden");
+      const hide = (el)=>el.classList.add("hidden");
+
+      $("signinBtn").addEventListener("click", async ()=>{
+        try{
+          await signInWithPopup(auth, provider);
+        }catch(e){ alert("ログインに失敗しました: " + e.message); }
+      });
+      $("signoutBtn").addEventListener("click", async ()=>{
+        await signOut(auth);
+      });
+
+      // 仮ボタン：まだDBは使わないので数字だけ動かす
+      let seconds = 0, orders = 0, earned = 0;
+      let timerId = null;
+      $("startBtn").addEventListener("click", ()=>{
+        if(timerId) return;
+        timerId = setInterval(()=>{
+          seconds += 5; earned += 10; // 5秒ごとに¥10加算（デモ）
+          $("time").textContent = `${Math.floor(seconds/60)}:${String(seconds%60).padStart(2,"0")}`;
+          $("wage").textContent = `¥${(seconds? Math.round((earned/(seconds/3600))) : 0).toLocaleString()}`;
+        }, 5000);
+      });
+      $("pauseBtn").addEventListener("click", ()=>{
+        if(timerId){ clearInterval(timerId); timerId=null; }
+      });
+      $("stopBtn").addEventListener("click", ()=>{
+        seconds=0; orders=0; earned=0;
+        ["time","wage","orders"].forEach(id=>$(id).textContent = id==="time" ? "0:00" : "0");
+        if(timerId){ clearInterval(timerId); timerId=null; }
+      });
+
+      onAuthStateChanged(auth, (user)=>{
+        if(user){
+          $("username").textContent = user.displayName || "配達員さん";
+          $("email").textContent = user.email || "";
+          $("avatar").src = user.photoURL || "";
+          show($("authed")); show($("signoutBtn")); hide($("signinBtn")); hide($("unauthed"));
+        }else{
+          hide($("authed")); hide($("signoutBtn")); show($("signinBtn")); show($("unauthed"));
         }
       });
     </script>
