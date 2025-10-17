@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>時給ハッカー | コックピット（スモーク→実保存）</title>
+    <title>時給ハッカー | コックピット（保存対応）</title>
     <style>
       /* ---- Warm Cozy Theme ----
          Base:  #F7EFE7 （あたたかいアイボリー, 面積 61.8%）
@@ -88,7 +88,7 @@
       a:hover{text-decoration:underline}
       .hidden{display:none}
 
-      /* 簡易モーダル */
+      /* モーダル */
       .modal-bg{position:fixed; inset:0; background:rgba(0,0,0,.2); display:grid; place-items:center}
       .modal{background:#fff; color:var(--ink); border-radius:14px; width:min(420px, 92vw); padding:18px; box-shadow:var(--shadow)}
       .modal h3{margin:0 0 10px 0; font-size:18px}
@@ -144,9 +144,9 @@
     </div>
 
     <!-- 保存用モーダル（終了時） -->
-    <div id="endModal" class="modal-bg hidden">
-      <div class="modal">
-        <h3>セッションを保存</h3>
+    <div id="endModal" class="modal-bg hidden" aria-hidden="true">
+      <div class="modal" role="dialog" aria-modal="true" aria-labelledby="saveTitle">
+        <h3 id="saveTitle">セッションを保存</h3>
         <div class="field">
           <label>売上（円）</label>
           <input id="inputSales" type="number" min="0" step="100" placeholder="例: 3500" />
@@ -156,8 +156,8 @@
           <input id="inputOrders" type="number" min="0" step="1" placeholder="例: 5" />
         </div>
         <div class="right">
-          <button id="cancelSave" class="ghost">キャンセル</button>
-          <button id="confirmSave">保存</button>
+          <button id="cancelSave" class="ghost" type="button">キャンセル</button>
+          <button id="confirmSave" type="button">保存</button>
         </div>
       </div>
     </div>
@@ -189,8 +189,7 @@
         signOut
       } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
       import {
-        getFirestore, collection, addDoc, doc, updateDoc,
-        serverTimestamp
+        getFirestore, collection, addDoc, updateDoc, serverTimestamp
       } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
       import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-analytics.js";
 
@@ -213,6 +212,9 @@
       const $   = (id)=>document.getElementById(id);
       const show= (el)=>el.classList.remove("hidden");
       const hide= (el)=>el.classList.add("hidden");
+
+      // 初期状態でモーダルは必ず閉じる（万一の残留対策）
+      hide($("endModal"));
 
       // UI状態
       let signingIn = false;
@@ -248,12 +250,12 @@
 
       $("startBtn").addEventListener("click", async ()=>{
         if (!auth.currentUser) { alert("先にログインしてください"); return; }
-        if (timerId) return;
+        if (timerId || currentSessionRef) return;
 
         // Firestore にセッション作成
         const uid = auth.currentUser.uid;
         const col = collection(db, "users", uid, "work_sessions");
-        const docRef = await addDoc(col, {
+        currentSessionRef = await addDoc(col, {
           status: "running",
           startTime: serverTimestamp(),
           endTime: null,
@@ -264,11 +266,10 @@
           createdAt: serverTimestamp(),
           updatedAt: serverTimestamp()
         });
-        currentSessionRef = docRef;
         startedAtMs = Date.now();
 
         // UI開始
-        if (!timerId) timerId = setInterval(tick, 5000);
+        timerId = setInterval(tick, 5000);
       });
 
       $("pauseBtn").addEventListener("click", ()=>{
@@ -277,43 +278,63 @@
 
       // 終了→入力モーダル表示
       $("stopBtn").addEventListener("click", ()=>{
+        if (!auth.currentUser) { alert("先にログインしてください"); return; }
         if (!currentSessionRef){ alert("まだ開始していません"); return; }
-        $("endModal").classList.remove("hidden");
+        show($("endModal"));
         $("inputSales").focus();
       });
-      $("cancelSave").addEventListener("click", ()=>{
-        $("endModal").classList.add("hidden");
+
+      // モーダル制御：外側クリック・Esc・キャンセルで閉じる
+      $("endModal").addEventListener("click", (e)=>{
+        if (e.target.id === "endModal") hide($("endModal"));
       });
+      document.addEventListener("keydown", (e)=>{
+        if (e.key === "Escape") hide($("endModal"));
+      });
+      $("cancelSave").addEventListener("click", ()=> hide($("endModal")));
+
       $("confirmSave").addEventListener("click", async ()=>{
+        if (!auth.currentUser){ alert("ログインが必要です"); hide($("endModal")); return; }
+        if (!currentSessionRef){ alert("セッションが見つかりません。もう一度開始してください"); hide($("endModal")); return; }
+
         const sales = Number($("inputSales").value || 0);
         const cnt   = Number($("inputOrders").value || 0);
-        if (sales < 0 || cnt < 0){ alert("数値を正しく入力してください"); return; }
+        if (!Number.isFinite(sales) || sales < 0 || !Number.isFinite(cnt) || cnt < 0){
+          alert("数値を正しく入力してください"); return;
+        }
 
         earned = sales; orders = cnt;
         // 見た目を即更新
         $("orders").textContent = String(orders);
         $("wage").textContent = `¥${(seconds? Math.round((earned/(seconds/3600))) : 0).toLocaleString()}`;
 
-        // Firestore 更新
+        // Firestore 更新（docがnullの場合はreturnするガード済み）
         const durationSec = Math.max(1, Math.round((Date.now() - (startedAtMs||Date.now()))/1000));
         const hours = durationSec / 3600;
         const hourly = hours > 0 ? Math.round(sales / hours) : 0;
 
-        await updateDoc(currentSessionRef, {
-          status: "ended",
-          endTime: serverTimestamp(),
-          ordersCount: cnt,
-          grossSales: sales,
-          durationSec,
-          hourlyWage: hourly,
-          updatedAt: serverTimestamp()
-        });
+        try{
+          await updateDoc(currentSessionRef, {
+            status: "ended",
+            endTime: serverTimestamp(),
+            ordersCount: cnt,
+            grossSales: sales,
+            durationSec,
+            hourlyWage: hourly,
+            updatedAt: serverTimestamp()
+          });
+        }catch(err){
+          alert("保存に失敗しました: " + (err?.message || err));
+          return;
+        }finally{
+          hide($("endModal"));
+        }
 
         // 片付け
-        $("endModal").classList.add("hidden");
         if (timerId){ clearInterval(timerId); timerId=null; }
         seconds = 0; earned = 0; orders = 0;
         currentSessionRef = null; startedAtMs = null;
+        $("time").textContent="0:00"; $("wage").textContent="¥0"; $("orders").textContent="0";
       });
 
       onAuthStateChanged(auth, (user)=>{
@@ -323,6 +344,7 @@
           $("avatar").src           = user.photoURL || "";
           show($("authed")); show($("signoutBtn")); hide($("signinBtn")); hide($("unauthed"));
         } else {
+          hide($("endModal")); // ログアウト時はモーダルも必ず閉じる
           hide($("authed")); hide($("signoutBtn")); show($("signinBtn")); show($("unauthed"));
           // セッション中断
           if (timerId){ clearInterval(timerId); timerId=null; }
