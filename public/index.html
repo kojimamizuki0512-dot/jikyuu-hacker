@@ -86,11 +86,18 @@
       }
       a{color:#6B4B1D; text-decoration:none}
       a:hover{text-decoration:underline}
-      .hidden{display:none}
 
-      /* モーダル */
-      .modal-bg{position:fixed; inset:0; background:rgba(0,0,0,.2); display:grid; place-items:center}
-      .modal{background:#fff; color:var(--ink); border-radius:14px; width:min(420px, 92vw); padding:18px; box-shadow:var(--shadow)}
+      /* ---- モーダル ---- */
+      .modal-bg{
+        position:fixed; inset:0; background:rgba(0,0,0,.2);
+        display:grid; place-items:center; z-index:1000;
+      }
+      /* ✅ hiddenを必ず勝たせる（前のルールを上書き） */
+      .modal-bg.hidden{ display:none !important; }
+      .modal{
+        background:#fff; color:var(--ink); border-radius:14px;
+        width:min(420px, 92vw); padding:18px; box-shadow:var(--shadow)
+      }
       .modal h3{margin:0 0 10px 0; font-size:18px}
       .field{margin:10px 0}
       .field label{font-size:12px; color:var(--muted)}
@@ -210,10 +217,10 @@
 
       // DOM util
       const $   = (id)=>document.getElementById(id);
-      const show= (el)=>el.classList.remove("hidden");
-      const hide= (el)=>el.classList.add("hidden");
+      const show= (el)=>{ el.classList.remove("hidden"); el.setAttribute("aria-hidden","false"); };
+      const hide= (el)=>{ el.classList.add("hidden");    el.setAttribute("aria-hidden","true");  };
 
-      // 初期状態でモーダルは必ず閉じる（万一の残留対策）
+      // 初期状態でモーダルは必ず閉じる（CSS競合の再保険）
       hide($("endModal"));
 
       // UI状態
@@ -308,7 +315,7 @@
         $("orders").textContent = String(orders);
         $("wage").textContent = `¥${(seconds? Math.round((earned/(seconds/3600))) : 0).toLocaleString()}`;
 
-        // Firestore 更新（docがnullの場合はreturnするガード済み）
+        // Firestore 更新
         const durationSec = Math.max(1, Math.round((Date.now() - (startedAtMs||Date.now()))/1000));
         const hours = durationSec / 3600;
         const hourly = hours > 0 ? Math.round(sales / hours) : 0;
@@ -342,6 +349,7 @@
           $("username").textContent = user.displayName || "配達員さん";
           $("email").textContent    = user.email || "";
           $("avatar").src           = user.photoURL || "";
+          document.querySelectorAll("#signinBtn,#signoutBtn").forEach(el=>el.classList.remove("hidden"));
           show($("authed")); show($("signoutBtn")); hide($("signinBtn")); hide($("unauthed"));
         } else {
           hide($("endModal")); // ログアウト時はモーダルも必ず閉じる
