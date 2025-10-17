@@ -3,40 +3,41 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>時給ハッカー | コックピット（スモーク）</title>
+    <title>時給ハッカー | コックピット（スモーク→実保存）</title>
     <style>
-      /* ---- Design Tokens (Light Theme) ----
-         Base:  #E9ECEF  （面積 61.8% 想定）
-         Ink:   #343A40
-         Accent:#FEC107  （面積 38.2% 想定）
+      /* ---- Warm Cozy Theme ----
+         Base:  #F7EFE7 （あたたかいアイボリー, 面積 61.8%）
+         Ink:   #2F2A26 （深いカカオ）
+         Accent:#E6A24B （やわらかゴールド）
       --------------------------------------*/
       :root{
-        --base:#E9ECEF;      /* 背景ベース */
-        --ink:#343A40;       /* 主要文字/枠 */
-        --muted:#6C757D;     /* 補助文字 */
-        --panel:#FFFFFF;     /* カード面 */
-        --accent:#FEC107;    /* 行動色（CTA） */
-        --accent-ink:#1F1F1F;/* アクセント上の文字 */
-        --radius:14px;
-        --shadow:0 8px 24px rgba(0,0,0,.10);
+        --base:#F7EFE7;
+        --ink:#2F2A26;
+        --muted:#7B726C;        /* 補助文字（温かめグレー） */
+        --panel:#FFFFFF;        /* カード面 */
+        --accent:#E6A24B;       /* 行動色（CTA） */
+        --accent-ink:#1E1A18;   /* アクセント上の文字 */
+        --accent-weak:#C88F46;  /* ホバー等の濃色 */
+        --radius:16px;
+        --shadow:0 10px 28px rgba(47,42,38,.10);
       }
       html,body{height:100%}
       body{
         margin:0; font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans JP", sans-serif;
         color:var(--ink);
-        /* 黄金比分割の背景。61.8%までベース、以降にアクセントのごく薄いベール */
+        /* 黄金比のベース:アクセントベール（61.8%:38.2%） */
         background:
           linear-gradient(135deg,
             var(--base) 0,
             var(--base) 61.8%,
-            rgba(254,193,7,0.12) 61.8%,
-            rgba(254,193,7,0.12) 100%);
+            rgba(230,162,75,0.12) 61.8%,
+            rgba(230,162,75,0.12) 100%);
         display:grid; place-items:center;
       }
       .card{
         width:min(960px, 92vw);
         background:var(--panel);
-        border:1px solid rgba(52,58,64,.10);
+        border:1px solid rgba(47,42,38,.10);
         border-radius:var(--radius);
         box-shadow:var(--shadow);
         padding:28px;
@@ -48,20 +49,21 @@
 
       button{
         appearance:none; border:none; border-radius:12px; padding:12px 16px;
-        font-weight:700; cursor:pointer; transition:.2s transform ease, .2s background;
+        font-weight:700; cursor:pointer; transition:.2s transform ease, .2s filter;
         background:var(--accent); color:var(--accent-ink);
-        box-shadow:0 2px 0 rgba(0,0,0,.08) inset;
+        box-shadow:0 2px 0 rgba(0,0,0,.06) inset;
       }
-      button:hover{ filter:brightness(.95) }
+      button:hover{ filter:brightness(.97) }
+      button:disabled{ opacity:.6; cursor:not-allowed }
       button.ghost{
         background:transparent; color:var(--ink);
-        border:1px solid rgba(52,58,64,.25)
+        border:1px solid rgba(47,42,38,.25)
       }
 
       .grid{display:grid; grid-template-columns:repeat(3, 1fr); gap:12px; margin-top:16px}
       .stat{
-        background:linear-gradient(180deg, #FFFFFF, #F8F9FA);
-        border:1px solid rgba(52,58,64,.15);
+        background:linear-gradient(180deg, #FFFFFF, #FAF6F1);
+        border:1px solid rgba(47,42,38,.12);
         border-radius:12px; padding:14px
       }
       .stat .label{color:var(--muted); font-size:12px}
@@ -70,29 +72,38 @@
       .map{
         height:260px; border-radius:12px; margin-top:16px;
         background:
-          linear-gradient(0deg, rgba(52,58,64,.06), rgba(52,58,64,.03)),
-          repeating-linear-gradient(0deg, rgba(52,58,64,.10) 0 1px, transparent 1px 40px),
-          repeating-linear-gradient(90deg, rgba(52,58,64,.10) 0 1px, transparent 1px 40px);
+          linear-gradient(0deg, rgba(47,42,38,.06), rgba(47,42,38,.03)),
+          repeating-linear-gradient(0deg, rgba(47,42,38,.10) 0 1px, transparent 1px 40px),
+          repeating-linear-gradient(90deg, rgba(47,42,38,.10) 0 1px, transparent 1px 40px);
         display:grid; place-items:center; color:var(--muted);
       }
       .footer{margin-top:18px; color:var(--muted); font-size:12px; text-align:center}
       .rowbtn{display:flex; gap:10px; margin-top:14px; flex-wrap:wrap}
       .tag{
-        background:rgba(254,193,7,.14); color:#8A6A00;
-        border:1px solid rgba(254,193,7,.55);
+        background:rgba(230,162,75,.16); color:#6B4B1D;
+        border:1px solid rgba(230,162,75,.55);
         padding:6px 10px; border-radius:999px; font-size:12px
       }
-      a{color:#8A6A00; text-decoration:none}
+      a{color:#6B4B1D; text-decoration:none}
       a:hover{text-decoration:underline}
       .hidden{display:none}
+
+      /* 簡易モーダル */
+      .modal-bg{position:fixed; inset:0; background:rgba(0,0,0,.2); display:grid; place-items:center}
+      .modal{background:#fff; color:var(--ink); border-radius:14px; width:min(420px, 92vw); padding:18px; box-shadow:var(--shadow)}
+      .modal h3{margin:0 0 10px 0; font-size:18px}
+      .field{margin:10px 0}
+      .field label{font-size:12px; color:var(--muted)}
+      .field input{width:100%; padding:10px 12px; border:1px solid rgba(47,42,38,.2); border-radius:10px; font-size:14px}
+      .right{display:flex; gap:10px; justify-content:flex-end; margin-top:12px}
     </style>
   </head>
   <body>
     <div class="card">
       <div class="row">
         <div class="grow">
-          <h1>時給ハッカー — コックピット（スモーク）</h1>
-          <div class="muted">Googleでログイン→仮コックピット表示。ここでは計測・DB書き込みはまだ行いません。</div>
+          <h1>時給ハッカー — コックピット</h1>
+          <div class="muted">Googleでログイン→開始/終了で「本物の保存」。地図は後続で統合。</div>
         </div>
         <div>
           <button id="signinBtn">Googleでログイン</button>
@@ -102,18 +113,18 @@
 
       <div id="authed" class="hidden">
         <div class="row" style="margin-top:14px">
-          <img id="avatar" src="" alt="" style="width:40px;height:40px;border-radius:50%;border:1px solid rgba(52,58,64,.25)">
+          <img id="avatar" src="" alt="" style="width:40px;height:40px;border-radius:50%;border:1px solid rgba(47,42,38,.25)">
           <div class="grow">
             <div id="username" style="font-weight:800"></div>
             <div class="muted" id="email"></div>
           </div>
-          <span class="tag">v0 スモーク</span>
+          <span class="tag">保存先：users/{uid}/work_sessions</span>
         </div>
 
         <div class="grid">
-          <div class="stat"><div class="label">現在の時給（仮）</div><div class="val" id="wage">¥0</div></div>
-          <div class="stat"><div class="label">今日の件数（仮）</div><div class="val" id="orders">0</div></div>
-          <div class="stat"><div class="label">稼働時間（仮）</div><div class="val" id="time">0:00</div></div>
+          <div class="stat"><div class="label">現在の時給（推定）</div><div class="val" id="wage">¥0</div></div>
+          <div class="stat"><div class="label">今日の件数</div><div class="val" id="orders">0</div></div>
+          <div class="stat"><div class="label">稼働時間</div><div class="val" id="time">0:00</div></div>
         </div>
 
         <div class="rowbtn">
@@ -132,6 +143,25 @@
       <div class="footer">© Jikyuu Hacker</div>
     </div>
 
+    <!-- 保存用モーダル（終了時） -->
+    <div id="endModal" class="modal-bg hidden">
+      <div class="modal">
+        <h3>セッションを保存</h3>
+        <div class="field">
+          <label>売上（円）</label>
+          <input id="inputSales" type="number" min="0" step="100" placeholder="例: 3500" />
+        </div>
+        <div class="field">
+          <label>件数</label>
+          <input id="inputOrders" type="number" min="0" step="1" placeholder="例: 5" />
+        </div>
+        <div class="right">
+          <button id="cancelSave" class="ghost">キャンセル</button>
+          <button id="confirmSave">保存</button>
+        </div>
+      </div>
+    </div>
+
     <!-- Firebase (Modules via CDN) -->
     <script type="module">
       // --- Firebase 設定（あなたの値をそのまま使用） ---
@@ -145,7 +175,7 @@
         measurementId: "G-B85Q3TRR6V"
       };
 
-      /* v11.0.1 で統一（Authは initializeAuth を使用） */
+      /* v11.0.1 で統一 */
       import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
       import {
         initializeAuth,
@@ -158,15 +188,17 @@
         signInWithRedirect,
         signOut
       } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
+      import {
+        getFirestore, collection, addDoc, doc, updateDoc,
+        serverTimestamp
+      } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
       import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-analytics.js";
 
       // --- 初期化 ---
       const app = initializeApp(firebaseConfig);
-
-      // Analytics は未対応環境だと例外を投げるので握りつぶす
       try { getAnalytics(app); } catch (_) {}
 
-      // Auth を明示初期化（永続化＋Popup Resolver 指定で安定化）
+      // Auth を明示初期化（永続化＋Popup Resolver 安定化）
       const auth = initializeAuth(app, {
         persistence: [indexedDBLocalPersistence, browserLocalPersistence],
         popupRedirectResolver: browserPopupRedirectResolver
@@ -174,50 +206,114 @@
       auth.languageCode = "ja";
       const provider = new GoogleAuthProvider();
 
+      // Firestore
+      const db = getFirestore(app);
+
+      // DOM util
       const $   = (id)=>document.getElementById(id);
       const show= (el)=>el.classList.remove("hidden");
       const hide= (el)=>el.classList.add("hidden");
 
-      // クリック連打ガード＋Redirectフォールバック
+      // UI状態
       let signingIn = false;
+      let timerId = null, seconds = 0, earned = 0, orders = 0;
+      let currentSessionRef = null;  // FirestoreのDoc参照
+      let startedAtMs = null;        // クライアント計測用
+
       $("signinBtn").addEventListener("click", async ()=>{
         if (signingIn) return;
-        signingIn = true;
-        $("signinBtn").disabled = true;
-        $("signinBtn").style.opacity = "0.7";
+        signingIn = true; $("signinBtn").disabled = true; $("signinBtn").style.opacity = ".7";
         try {
           await signInWithPopup(auth, provider);
         } catch(e) {
           const msg = String(e?.message || "");
-          if (e?.code === "auth/popup-blocked" || msg.includes("Pending promise")) {
+          if (e?.code === "auth/popup-blocked" || msg.includes("Pending promise")){
             await signInWithRedirect(auth, provider);
           } else {
             alert("ログインに失敗しました: " + (e?.message || e));
           }
         } finally {
-          signingIn = false;
-          $("signinBtn").disabled = false;
-          $("signinBtn").style.opacity = "";
+          signingIn = false; $("signinBtn").disabled = false; $("signinBtn").style.opacity = "";
         }
       });
-
       $("signoutBtn").addEventListener("click", async ()=>{ await signOut(auth); });
 
-      // 仮のタイマー（DB未使用）
-      let seconds = 0, orders = 0, earned = 0, timerId = null;
-      $("startBtn").addEventListener("click", ()=>{
+      // タイマー（見た目の推定）
+      function tick(){
+        seconds += 5; // デモ用 5秒刻み
+        $("time").textContent = `${Math.floor(seconds/60)}:${String(seconds%60).padStart(2,"0")}`;
+        $("wage").textContent = `¥${(seconds? Math.round((earned/(seconds/3600))) : 0).toLocaleString()}`;
+        $("orders").textContent = String(orders);
+      }
+
+      $("startBtn").addEventListener("click", async ()=>{
+        if (!auth.currentUser) { alert("先にログインしてください"); return; }
         if (timerId) return;
-        timerId = setInterval(()=>{
-          seconds += 5; earned += 10; // デモ：5秒ごとに¥10加算
-          $("time").textContent = `${Math.floor(seconds/60)}:${String(seconds%60).padStart(2,"0")}`;
-          $("wage").textContent = `¥${(seconds? Math.round((earned/(seconds/3600))) : 0).toLocaleString()}`;
-        }, 5000);
+
+        // Firestore にセッション作成
+        const uid = auth.currentUser.uid;
+        const col = collection(db, "users", uid, "work_sessions");
+        const docRef = await addDoc(col, {
+          status: "running",
+          startTime: serverTimestamp(),
+          endTime: null,
+          ordersCount: 0,
+          grossSales: 0,
+          areaGeohash: null,
+          areaLabel: null,
+          createdAt: serverTimestamp(),
+          updatedAt: serverTimestamp()
+        });
+        currentSessionRef = docRef;
+        startedAtMs = Date.now();
+
+        // UI開始
+        if (!timerId) timerId = setInterval(tick, 5000);
       });
-      $("pauseBtn").addEventListener("click", ()=>{ if (timerId){ clearInterval(timerId); timerId=null; }});
-      $("stopBtn").addEventListener("click", ()=>{
-        seconds=0; orders=0; earned=0;
-        ["time","wage","orders"].forEach(id=>$(id).textContent = id==="time" ? "0:00" : "0");
+
+      $("pauseBtn").addEventListener("click", ()=>{
         if (timerId){ clearInterval(timerId); timerId=null; }
+      });
+
+      // 終了→入力モーダル表示
+      $("stopBtn").addEventListener("click", ()=>{
+        if (!currentSessionRef){ alert("まだ開始していません"); return; }
+        $("endModal").classList.remove("hidden");
+        $("inputSales").focus();
+      });
+      $("cancelSave").addEventListener("click", ()=>{
+        $("endModal").classList.add("hidden");
+      });
+      $("confirmSave").addEventListener("click", async ()=>{
+        const sales = Number($("inputSales").value || 0);
+        const cnt   = Number($("inputOrders").value || 0);
+        if (sales < 0 || cnt < 0){ alert("数値を正しく入力してください"); return; }
+
+        earned = sales; orders = cnt;
+        // 見た目を即更新
+        $("orders").textContent = String(orders);
+        $("wage").textContent = `¥${(seconds? Math.round((earned/(seconds/3600))) : 0).toLocaleString()}`;
+
+        // Firestore 更新
+        const durationSec = Math.max(1, Math.round((Date.now() - (startedAtMs||Date.now()))/1000));
+        const hours = durationSec / 3600;
+        const hourly = hours > 0 ? Math.round(sales / hours) : 0;
+
+        await updateDoc(currentSessionRef, {
+          status: "ended",
+          endTime: serverTimestamp(),
+          ordersCount: cnt,
+          grossSales: sales,
+          durationSec,
+          hourlyWage: hourly,
+          updatedAt: serverTimestamp()
+        });
+
+        // 片付け
+        $("endModal").classList.add("hidden");
+        if (timerId){ clearInterval(timerId); timerId=null; }
+        seconds = 0; earned = 0; orders = 0;
+        currentSessionRef = null; startedAtMs = null;
       });
 
       onAuthStateChanged(auth, (user)=>{
@@ -228,6 +324,10 @@
           show($("authed")); show($("signoutBtn")); hide($("signinBtn")); hide($("unauthed"));
         } else {
           hide($("authed")); hide($("signoutBtn")); show($("signinBtn")); show($("unauthed"));
+          // セッション中断
+          if (timerId){ clearInterval(timerId); timerId=null; }
+          seconds=0; earned=0; orders=0; startedAtMs=null; currentSessionRef=null;
+          $("time").textContent="0:00"; $("wage").textContent="¥0"; $("orders").textContent="0";
         }
       });
     </script>

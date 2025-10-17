@@ -1,0 +1,22 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // 認証済ユーザー専用の名前空間
+    match /users/{uid} {
+      // 自分の直下プロフィールなど（必要なら）
+      allow read, write: if request.auth != null && request.auth.uid == uid;
+
+      // 稼働セッション
+      match /work_sessions/{docId} {
+        allow read, write: if request.auth != null && request.auth.uid == uid;
+
+        // 追加のガード（オプション）
+        // allow create: if request.resource.data.status == "running";
+        // allow update: if resource.data.status in ["running", "ended"];
+      }
+    }
+
+    // 将来の公開集計などは別コレクションで read: if true のみにする
+  }
+}
