@@ -5,51 +5,84 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>時給ハッカー | コックピット（スモーク）</title>
     <style>
+      /* ---- Design Tokens (Light Theme) ----
+         Base:  #E9ECEF  （面積 61.8% 想定）
+         Ink:   #343A40
+         Accent:#FEC107  （面積 38.2% 想定）
+      --------------------------------------*/
       :root{
-        --bg:#0f1213;           /* 深いダーク */
-        --panel:#151a1b;        /* パネル面 */
-        --muted:#a8b3ad;        /* サブ文字 */
-        --text:#e9f2ee;         /* 主要文字 */
-        --accent:#2aa676;       /* エメラルド */
-        --accent-weak:#1c6d4e;  /* ホバー等 */
-        --danger:#ff5a5f;
-        --radius:14px;          /* 角丸トークン */
-        --shadow:0 8px 24px rgba(0,0,0,.35);
+        --base:#E9ECEF;      /* 背景ベース */
+        --ink:#343A40;       /* 主要文字/枠 */
+        --muted:#6C757D;     /* 補助文字 */
+        --panel:#FFFFFF;     /* カード面 */
+        --accent:#FEC107;    /* 行動色（CTA） */
+        --accent-ink:#1F1F1F;/* アクセント上の文字 */
+        --radius:14px;
+        --shadow:0 8px 24px rgba(0,0,0,.10);
       }
       html,body{height:100%}
       body{
         margin:0; font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans JP", sans-serif;
-        background: radial-gradient(1200px 800px at 70% -10%, rgba(42,166,118,.15), transparent 60%) , var(--bg);
-        color:var(--text); display:grid; place-items:center;
+        color:var(--ink);
+        /* 黄金比分割の背景。61.8%までベース、以降にアクセントのごく薄いベール */
+        background:
+          linear-gradient(135deg,
+            var(--base) 0,
+            var(--base) 61.8%,
+            rgba(254,193,7,0.12) 61.8%,
+            rgba(254,193,7,0.12) 100%);
+        display:grid; place-items:center;
       }
       .card{
-        width:min(720px, 92vw); background:linear-gradient(180deg, rgba(255,255,255,.02), rgba(255,255,255,.00));
-        border:1px solid rgba(255,255,255,.06); border-radius:var(--radius); box-shadow:var(--shadow); padding:28px;
+        width:min(960px, 92vw);
+        background:var(--panel);
+        border:1px solid rgba(52,58,64,.10);
+        border-radius:var(--radius);
+        box-shadow:var(--shadow);
+        padding:28px;
       }
       .row{display:flex; gap:16px; align-items:center; flex-wrap:wrap}
       .grow{flex:1}
       h1{margin:0 0 4px 0; font-size:22px; letter-spacing:.2px}
       .muted{color:var(--muted); font-size:13px}
+
       button{
-        appearance:none; border:none; border-radius:12px; padding:12px 16px; font-weight:600; cursor:pointer;
-        background:var(--accent); color:#081b14; transition:.2s transform ease, .2s background;
+        appearance:none; border:none; border-radius:12px; padding:12px 16px;
+        font-weight:700; cursor:pointer; transition:.2s transform ease, .2s background;
+        background:var(--accent); color:var(--accent-ink);
+        box-shadow:0 2px 0 rgba(0,0,0,.08) inset;
       }
-      button:hover{ background:var(--accent-weak); color:#dff6ee }
-      button.ghost{ background:transparent; color:var(--text); border:1px solid rgba(255,255,255,.12) }
+      button:hover{ filter:brightness(.95) }
+      button.ghost{
+        background:transparent; color:var(--ink);
+        border:1px solid rgba(52,58,64,.25)
+      }
+
       .grid{display:grid; grid-template-columns:repeat(3, 1fr); gap:12px; margin-top:16px}
-      .stat{background:var(--panel); border:1px solid rgba(255,255,255,.06); border-radius:12px; padding:14px}
+      .stat{
+        background:linear-gradient(180deg, #FFFFFF, #F8F9FA);
+        border:1px solid rgba(52,58,64,.15);
+        border-radius:12px; padding:14px
+      }
       .stat .label{color:var(--muted); font-size:12px}
-      .stat .val{font-size:20px; font-weight:700; margin-top:6px}
+      .stat .val{font-size:20px; font-weight:800; margin-top:6px}
+
       .map{
-        height:260px; border-radius:12px; margin-top:16px; background:
-          linear-gradient(0deg, rgba(42,166,118,.10), rgba(42,166,118,.06)),
-          url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="640" height="320"><rect width="100%" height="100%" fill="%23151a1b"/><g stroke="%23242a2b" stroke-width="1" opacity=".9"><path d="M0 40 H640 M0 80 H640 M0 120 H640 M0 160 H640 M0 200 H640 M0 240 H640 M0 280 H640"/><path d="M80 0 V320 M160 0 V320 M240 0 V320 M320 0 V320 M400 0 V320 M480 0 V320 M560 0 V320"/></g><circle cx="360" cy="160" r="48" fill="url(%23g)"/></svg>');
+        height:260px; border-radius:12px; margin-top:16px;
+        background:
+          linear-gradient(0deg, rgba(52,58,64,.06), rgba(52,58,64,.03)),
+          repeating-linear-gradient(0deg, rgba(52,58,64,.10) 0 1px, transparent 1px 40px),
+          repeating-linear-gradient(90deg, rgba(52,58,64,.10) 0 1px, transparent 1px 40px);
         display:grid; place-items:center; color:var(--muted);
       }
       .footer{margin-top:18px; color:var(--muted); font-size:12px; text-align:center}
       .rowbtn{display:flex; gap:10px; margin-top:14px; flex-wrap:wrap}
-      .tag{background:rgba(42,166,118,.12); color:#c8f1e3; border:1px solid rgba(42,166,118,.35); padding:6px 10px; border-radius:999px; font-size:12px}
-      a{color:#7adbb5; text-decoration:none}
+      .tag{
+        background:rgba(254,193,7,.14); color:#8A6A00;
+        border:1px solid rgba(254,193,7,.55);
+        padding:6px 10px; border-radius:999px; font-size:12px
+      }
+      a{color:#8A6A00; text-decoration:none}
       a:hover{text-decoration:underline}
       .hidden{display:none}
     </style>
@@ -69,9 +102,9 @@
 
       <div id="authed" class="hidden">
         <div class="row" style="margin-top:14px">
-          <img id="avatar" src="" alt="" style="width:40px;height:40px;border-radius:50%;border:1px solid rgba(255,255,255,.15)">
+          <img id="avatar" src="" alt="" style="width:40px;height:40px;border-radius:50%;border:1px solid rgba(52,58,64,.25)">
           <div class="grow">
-            <div id="username" style="font-weight:700"></div>
+            <div id="username" style="font-weight:800"></div>
             <div class="muted" id="email"></div>
           </div>
           <span class="tag">v0 スモーク</span>
@@ -101,18 +134,17 @@
 
     <!-- Firebase (Modules via CDN) -->
     <script type="module">
-      // 1) ここを Firebase コンソールの「ウェブアプリ設定」の値で置き換える
+      // ★ ここは「あなたの既存の値」をそのまま残してください（置き換えない）
       const firebaseConfig = {
-        apiKey: "AIzaSyA8x75S7gx0vF4CtENATZO0Spnn33t_Oyg",
-        authDomain: "jikyuu-hacker.firebaseapp.com",
-        projectId: "jikyuu-hacker",
-        storageBucket: "jikyuu-hacker.firebasestorage.app",
-        messagingSenderId: "141311985365",
-        appId: "1:141311985365:web:41f64d51bcc7737d5c445c",
-        measurementId: "G-B85Q3TRR6V"
-       };
+        apiKey: "（あなたの値）",
+        authDomain: "（あなたの値）",
+        projectId: "（あなたの値）",
+        appId: "（あなたの値）",
+        storageBucket: "（あなたの値）",
+        messagingSenderId: "（あなたの値）"
+      };
 
-
+      /* v11.0.1 で import を統一 */
       import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
       import {
         getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged
@@ -128,17 +160,13 @@
       const hide = (el)=>el.classList.add("hidden");
 
       $("signinBtn").addEventListener("click", async ()=>{
-        try{
-          await signInWithPopup(auth, provider);
-        }catch(e){ alert("ログインに失敗しました: " + e.message); }
+        try{ await signInWithPopup(auth, provider); }
+        catch(e){ alert("ログインに失敗しました: " + e.message); }
       });
-      $("signoutBtn").addEventListener("click", async ()=>{
-        await signOut(auth);
-      });
+      $("signoutBtn").addEventListener("click", async ()=>{ await signOut(auth); });
 
       // 仮ボタン：まだDBは使わないので数字だけ動かす
-      let seconds = 0, orders = 0, earned = 0;
-      let timerId = null;
+      let seconds = 0, orders = 0, earned = 0, timerId = null;
       $("startBtn").addEventListener("click", ()=>{
         if(timerId) return;
         timerId = setInterval(()=>{
@@ -147,9 +175,7 @@
           $("wage").textContent = `¥${(seconds? Math.round((earned/(seconds/3600))) : 0).toLocaleString()}`;
         }, 5000);
       });
-      $("pauseBtn").addEventListener("click", ()=>{
-        if(timerId){ clearInterval(timerId); timerId=null; }
-      });
+      $("pauseBtn").addEventListener("click", ()=>{ if(timerId){ clearInterval(timerId); timerId=null; }});
       $("stopBtn").addEventListener("click", ()=>{
         seconds=0; orders=0; earned=0;
         ["time","wage","orders"].forEach(id=>$(id).textContent = id==="time" ? "0:00" : "0");
