@@ -2,16 +2,18 @@
 <html lang="ja">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>時給ハッカー | Atelier White & Mauve + HACOBIT</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>時給ハッカー | Atelier White & Mauve + HACOBIT Dock</title>
     <meta name="color-scheme" content="light only" />
     <style>
       :root{
         --base:#F6F4F2; --ink:#413D4B; --ink-weak:#6D6877;
         --primary:#A18291; --primary-strong:#8C6F7D; --accent:#B58A6C;
-        --panel:#FFFFFF; --radius-lg:22px; --radius:14px;
+        --panel:#FFFFFF;
+        --radius-lg:22px; --radius:14px;
         --shadow-lg:0 24px 60px rgba(65,61,75,.12), 0 2px 10px rgba(65,61,75,.04);
         --shadow-sm:0 8px 24px rgba(65,61,75,.10);
+        --safe-bottom: env(safe-area-inset-bottom, 0px);
       }
       html,body{height:100%}
       body{
@@ -24,100 +26,223 @@
         display:grid; place-items:center;
       }
       .app{
-        width:min(1100px, 94vw); border-radius:22px; box-shadow:var(--shadow-lg);
+        width:min(1100px, 94vw);
+        border-radius:var(--radius-lg);
+        box-shadow:var(--shadow-lg);
         background:linear-gradient(180deg, rgba(255,255,255,.75), rgba(255,255,255,.60));
-        backdrop-filter:saturate(1.2) blur(10px); -webkit-backdrop-filter:saturate(1.2) blur(10px);
-        border:1px solid rgba(65,61,75,.08); overflow:hidden;
+        backdrop-filter:saturate(1.2) blur(10px);
+        -webkit-backdrop-filter:saturate(1.2) blur(10px);
+        border:1px solid rgba(65,61,75,.08);
+        overflow:hidden;
       }
-      .header{display:flex; align-items:center; gap:14px; padding:18px 22px; border-bottom:1px solid rgba(65,61,75,.06);
-        background:linear-gradient(180deg, rgba(255,255,255,.85), rgba(255,255,255,.65))}
-      .logo{width:40px;height:40px;border-radius:12px;background:
-        radial-gradient(60% 60% at 30% 30%, rgba(255,255,255,.65), transparent 60%),
-        linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%); box-shadow:var(--shadow-sm)}
-      .ttl{font-weight:900; letter-spacing:.3px} .sub{color:var(--ink-weak); font-size:13px} .spacer{flex:1}
-      .ghost{background:transparent; color:var(--ink); border:1px solid rgba(65,61,75,.20); border-radius:999px; padding:10px 14px; font-weight:700; cursor:pointer}
-      .btn{appearance:none;border:none;border-radius:999px;background:linear-gradient(180deg, var(--primary) 0%, var(--primary-strong) 100%);
-        color:#FFF;padding:12px 18px;font-weight:800;letter-spacing:.2px;box-shadow:0 6px 14px rgba(161,130,145,.35), inset 0 2px 0 rgba(255,255,255,.25);
-        transform:translateY(0);transition:.15s transform ease,.2s filter ease;cursor:pointer}
-      .btn:hover{filter:brightness(1.03)} .btn:active{transform:translateY(2px)}
+      .header{
+        display:flex; align-items:center; gap:14px; padding:18px 22px;
+        border-bottom:1px solid rgba(65,61,75,.06);
+        background:linear-gradient(180deg, rgba(255,255,255,.85), rgba(255,255,255,.65));
+      }
+      .logo{
+        width:40px;height:40px;border-radius:12px;
+        background:
+          radial-gradient(60% 60% at 30% 30%, rgba(255,255,255,.65), transparent 60%),
+          linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+        box-shadow:var(--shadow-sm);
+      }
+      .ttl{font-weight:900; letter-spacing:.3px}
+      .sub{color:var(--ink-weak); font-size:13px}
+      .spacer{flex:1}
+      .ghost{
+        background:transparent; color:var(--ink);
+        border:1px solid rgba(65,61,75,.20); border-radius:999px; padding:10px 14px;
+        font-weight:700; cursor:pointer;
+      }
+      .btn{
+        appearance:none; border:none; border-radius:999px;
+        background:linear-gradient(180deg, var(--primary) 0%, var(--primary-strong) 100%);
+        color:#FFF; padding:12px 18px; font-weight:800; letter-spacing:.2px;
+        box-shadow:0 6px 14px rgba(161,130,145,.35), inset 0 2px 0 rgba(255,255,255,.25);
+        transform:translateY(0); transition:.15s transform ease, .2s filter ease;
+        cursor:pointer; touch-action:manipulation;
+      }
+      .btn:hover{ filter:brightness(1.03) }
+      .btn:active{ transform:translateY(2px) }
+
       .hero{display:flex; gap:16px; align-items:flex-start; padding:18px 22px 2px}
-      .hero-bubble{flex:1;background:linear-gradient(180deg, rgba(255,255,255,.85), rgba(255,255,255,.62));
-        backdrop-filter:blur(8px);border:1px solid rgba(65,61,75,.08);border-radius:18px;padding:16px;box-shadow:var(--shadow-sm)}
+      .hero-bubble{
+        flex:1;
+        background:linear-gradient(180deg, rgba(255,255,255,.85), rgba(255,255,255,.62));
+        backdrop-filter:blur(8px);
+        border:1px solid rgba(65,61,75,.08); border-radius:18px; padding:16px;
+        box-shadow:var(--shadow-sm);
+      }
+      .hero-bubble h1{margin:0 0 6px 0; font-size:20px}
       .micro{color:var(--ink-weak); font-size:13px}
+
       .profile{display:flex; align-items:center; gap:12px; padding:0 22px 12px}
       .avatar{width:44px;height:44px;border-radius:50%;border:1px solid rgba(65,61,75,.15)}
-      .tag{display:inline-flex;align-items:center;gap:8px;border:1px solid rgba(181,138,108,.45);background:rgba(181,138,108,.12);
-        color:var(--accent);border-radius:999px;padding:6px 10px;font-weight:700;font-size:12px}
-      .grid{display:grid; grid-template-columns:repeat(3,1fr); gap:14px; padding:0 22px}
-      .card{background:
-        linear-gradient(180deg, rgba(255,255,255,.92), rgba(255,255,255,.70)),
-        radial-gradient(100% 140% at 100% 0, rgba(181,138,108,.10), transparent 35%),
-        radial-gradient(100% 140% at 0 100%, rgba(161,130,145,.08), transparent 35%);
-        border:1px solid rgba(65,61,75,.08); border-radius:16px; padding:14px; box-shadow:var(--shadow-sm)}
-      .label{font-size:12px; color:var(--ink-weak)} .value{font-size:22px; font-weight:900; letter-spacing:.2px; margin-top:6px}
+      .tag{
+        display:inline-flex; align-items:center; gap:8px;
+        border:1px solid rgba(181,138,108,.45);
+        background:rgba(181,138,108,.12);
+        color:var(--accent);
+        border-radius:999px; padding:6px 10px; font-weight:700; font-size:12px
+      }
+
+      .grid{display:grid; grid-template-columns:repeat(3,1fr); gap:14px; padding:0 22px;}
+      .card{
+        background:
+          linear-gradient(180deg, rgba(255,255,255,.92), rgba(255,255,255,.70)),
+          radial-gradient(100% 140% at 100% 0, rgba(181,138,108,.10), transparent 35%),
+          radial-gradient(100% 140% at 0 100%, rgba(161,130,145,.08), transparent 35%);
+        border:1px solid rgba(65,61,75,.08); border-radius:16px; padding:14px;
+        box-shadow:var(--shadow-sm);
+      }
+      .label{font-size:12px; color:var(--ink-weak)}
+      .value{font-size:22px; font-weight:900; letter-spacing:.2px; margin-top:6px}
+
       .actions{display:flex; gap:10px; padding:10px 22px 16px}
-      .chip{border:1px solid rgba(65,61,75,.18); background:rgba(255,255,255,.6); padding:10px 14px; border-radius:12px; font-weight:800; color:var(--ink); cursor:pointer; transition:.15s transform ease}
-      .chip:active{transform:translateY(2px)}
-      .chip.primary{border-color:transparent;background:linear-gradient(180deg, var(--primary) 0%, var(--primary-strong) 100%); color:#fff;
-        box-shadow:0 6px 14px rgba(161,130,145,.35), inset 0 2px 0 rgba(255,255,255,.20)}
-      .board{margin:4px 22px 22px; height:280px; border-radius:18px; background:
-        linear-gradient(180deg, rgba(255,255,255,.9), rgba(255,255,255,.7)),
-        repeating-linear-gradient(0deg, rgba(65,61,75,.08) 0 1px, transparent 1px 48px),
-        repeating-linear-gradient(90deg, rgba(65,61,75,.08) 0 1px, transparent 1px 48px);
-        border:1px solid rgba(65,61,75,.08); box-shadow:var(--shadow-sm); display:grid; place-items:center; color:var(--ink-weak)}
-      /* toast with HACOBIT */
-      .toast{position:fixed; left:50%; bottom:26px; transform:translateX(-50%);
+      .chip{
+        border:1px solid rgba(65,61,75,.18); background:rgba(255,255,255,.6);
+        padding:12px 16px; border-radius:14px; font-weight:800; color:var(--ink);
+        cursor:pointer; transition:.15s transform ease; touch-action:manipulation;
+        min-width:48px; min-height:44px;
+      }
+      .chip:active{ transform:translateY(2px); }
+      .chip.primary{
+        border-color:transparent;
+        background:
+          linear-gradient(180deg, var(--primary) 0%, var(--primary-strong) 100%);
+        color:#fff;
+        box-shadow:0 6px 14px rgba(161,130,145,.35), inset 0 2px 0 rgba(255,255,255,.20);
+      }
+
+      .board{
+        margin:4px 22px 22px; height:280px; border-radius:18px;
+        background:
+          linear-gradient(180deg, rgba(255,255,255,.9), rgba(255,255,255,.7)),
+          repeating-linear-gradient(0deg, rgba(65,61,75,.08) 0 1px, transparent 1px 48px),
+          repeating-linear-gradient(90deg, rgba(65,61,75,.08) 0 1px, transparent 1px 48px);
+        border:1px solid rgba(65,61,75,.08);
+        box-shadow:var(--shadow-sm); display:grid; place-items:center; color:var(--ink-weak);
+      }
+
+      /* ======== Toast (text only; animation is on persistent HACOBIT) ======== */
+      .toast{
+        position:fixed; left:50%;
+        bottom:calc(22px + var(--safe-bottom));
+        transform:translateX(-50%);
         background:linear-gradient(180deg, #fff, rgba(255,255,255,.92));
         border:1px solid rgba(65,61,75,.10); color:var(--ink); font-weight:800;
-        padding:10px 14px; border-radius:999px; box-shadow:var(--shadow-sm); z-index:1200; display:flex; align-items:center; gap:10px}
+        padding:10px 14px; border-radius:999px; box-shadow:var(--shadow-sm); z-index:1200;
+      }
       .hidden{display:none !important}
 
-      /* modal */
+      /* ======== Modal ======== */
       .modal-bg{position:fixed; inset:0; z-index:1100; display:grid; place-items:center; background:rgba(65,61,75,.18)}
       .modal{width:min(440px, 92vw); background:linear-gradient(180deg, #fff, rgba(255,255,255,.94));
         border:1px solid rgba(65,61,75,.12); border-radius:18px; padding:18px; box-shadow:var(--shadow-lg)}
-      .modal h3{margin:0 0 10px 0} .field{margin:10px 0} .field label{font-size:12px; color:var(--ink-weak)}
-      .field input{width:100%; padding:12px 14px; border-radius:12px; border:1px solid rgba(65,61,75,.18); background:rgba(255,255,255,.8); color:var(--ink)}
-      .right{display:flex; gap:10px; justify-content:flex-end; margin-top:12px}
-      @media (prefers-reduced-motion: no-preference){
-        .card,.hero-bubble,.board{animation:floatUp .28s ease both}
-        @keyframes floatUp{from{opacity:0; transform:translateY(4px)} to{opacity:1; transform:translateY(0)}}
+      .modal h3{margin:0 0 10px 0}
+      .field{margin:10px 0}
+      .field label{font-size:12px; color:var(--ink-weak)}
+      .field input{
+        width:100%; padding:12px 14px; border-radius:12px;
+        border:1px solid rgba(65,61,75,.18); background:rgba(255,255,255,.8); color:var(--ink)
       }
-      @media (max-width:720px){.grid{grid-template-columns:1fr; gap:10px} .actions{flex-wrap:wrap} .hero{flex-direction:column}}
-      /* ===================== HACOBIT (SVG) motion ===================== */
-      /* Timeline total 1.0s (60fps想定). Body±4px, Arm +12°, Blink scaleY .7, Scarf delay .08s w/ overshoot. */
-      #hb.play #hb_body{animation:hb_body_up .12s ease-out both, hb_body_relax .24s .60s ease-in-out both, hb_body_return .16s .84s linear both}
+      .right{display:flex; gap:10px; justify-content:flex-end; margin-top:12px}
+
+      /* ======== HACOBIT Dock (always-on mascot) ======== */
+      .hb-dock{
+        position:fixed; left:18px; bottom:calc(78px + var(--safe-bottom));
+        z-index:1250; display:flex; align-items:flex-end; gap:8px;
+        user-select:none; -webkit-user-select:none;
+      }
+      .hb-bubble{
+        background:#fff; border:1px solid rgba(65,61,75,.12);
+        padding:8px 10px; border-radius:12px; box-shadow:var(--shadow-sm);
+        color:var(--ink); font-weight:700; font-size:12px; max-width:220px;
+        transform-origin: bottom left;
+      }
+      .hb-bubble.hidden{display:none}
+      .hb-touch{outline:none; border:none; padding:0; background:transparent; cursor:pointer}
+      .hb-touch:active{transform:translateY(2px)}
+      .hb-wrap{width:72px; height:72px}
+
+      /* Idle bob (gentle breathing). Disabled when .play is active */
+      @keyframes hb_idle_bob{ 0%,100%{transform:translateY(0)} 50%{transform:translateY(-2px)} }
+      #hbMain.idle:not(.play) #hb_body{ animation: hb_idle_bob 3s ease-in-out infinite; }
+      /* Random blink: triggered by JS by toggling .blink */
+      @keyframes hb_blink{ from{transform:scaleY(1)} to{transform:scaleY(.7)} }
+      #hbMain.blink #hb_eyes{ animation: hb_blink .12s linear both; }
+
+      /* Success pose timeline (1.0s) */
+      #hbMain.play #hb_body{animation:hb_body_up .12s ease-out both, hb_body_relax .24s .60s ease-in-out both, hb_body_return .16s .84s linear both}
       @keyframes hb_body_up{from{transform:translateY(0)} to{transform:translateY(-4px)}}
       @keyframes hb_body_relax{from{transform:translateY(-4px)} to{transform:translateY(-2px)}}
       @keyframes hb_body_return{from{transform:translateY(-2px)} to{transform:translateY(0)}}
 
-      #hb.play #hb_armR{transform-origin: 280px 260px; animation:hb_arm_raise .16s .12s ease-out both}
+      #hbMain.play #hb_armR{transform-origin: 280px 260px; animation:hb_arm_raise .16s .12s ease-out both}
       @keyframes hb_arm_raise{from{transform:rotate(0deg) translate(0,0)} to{transform:rotate(12deg) translate(6px,-2px)}}
 
-      #hb.play #hb_scarf{transform-origin: 256px 300px; animation:hb_scarf_follow .16s .20s cubic-bezier(.34,1.56,.64,1) both}
+      #hbMain.play #hb_scarf{transform-origin: 256px 300px; animation:hb_scarf_follow .16s .20s cubic-bezier(.34,1.56,.64,1) both}
       @keyframes hb_scarf_follow{0%{transform:rotate(0deg)}70%{transform:rotate(6deg)}100%{transform:rotate(-3deg)}}
 
-      #hb.play #hb_eyes{animation:hb_blink .12s .44s linear both}
-      @keyframes hb_blink{0%{transform:scaleY(1)}100%{transform:scaleY(.7)}}
-      /* soft drop shadow (filter y=1.5px, blur=4px, opacity=12%) is defined inside SVG and applied to hb_group */
+      /* Respect reduced motion */
+      @media (prefers-reduced-motion: reduce){
+        #hbMain.idle #hb_body, #hbMain.blink #hb_eyes, #hbMain.play #hb_body,
+        #hbMain.play #hb_armR, #hbMain.play #hb_scarf { animation:none !important; }
+      }
+
+      /* ======== Mobile-friendly tweaks ======== */
+      @media (max-width:720px){
+        .grid{grid-template-columns:1fr; gap:10px}
+        .actions{display:none} /* 上部のアクションは隠す（下の固定バーに集約） */
+        .hb-dock{left:14px; bottom:calc(92px + var(--safe-bottom))}
+      }
+      /* Bottom Action Bar (mobile) */
+      .mbar{
+        position:fixed; left:0; right:0; bottom:0;
+        padding:8px 10px calc(8px + var(--safe-bottom));
+        background:linear-gradient(180deg, rgba(255,255,255,.9), rgba(255,255,255,.98));
+        border-top:1px solid rgba(65,61,75,.10);
+        display:none; gap:10px; justify-content:center; z-index:1200;
+        backdrop-filter:blur(8px);
+      }
+      .mbar .mbtn{
+        flex:1; min-height:48px; border-radius:14px; font-weight:900; letter-spacing:.2px; touch-action:manipulation;
+        border:1px solid rgba(65,61,75,.18); background:#fff; color:var(--ink);
+      }
+      .mbar .mbtn.primary{
+        border:none; background:linear-gradient(180deg, var(--primary) 0%, var(--primary-strong) 100%); color:#fff;
+        box-shadow:0 6px 14px rgba(161,130,145,.30), inset 0 2px 0 rgba(255,255,255,.20);
+      }
+      @media (max-width:720px){ .mbar{display:flex} }
+
+      /* gentle enter anims */
+      @media (prefers-reduced-motion: no-preference){
+        .card,.hero-bubble,.board{animation:floatUp .28s ease both}
+        @keyframes floatUp{from{opacity:0; transform:translateY(4px)} to{opacity:1; transform:translateY(0)}}
+      }
     </style>
   </head>
   <body>
     <div class="app" role="application" aria-label="時給ハッカー コックピット">
+      <!-- Header -->
       <div class="header">
         <div class="logo" aria-hidden="true"></div>
-        <div><div class="ttl">時給ハッカー</div><div class="sub">創造的で、上質な「頼れるパートナー」</div></div>
+        <div>
+          <div class="ttl">時給ハッカー</div>
+          <div class="sub">創造的で、上質な「頼れるパートナー」</div>
+        </div>
         <div class="spacer"></div>
         <button id="signinBtn" class="btn">Googleでログイン</button>
         <button id="signoutBtn" class="ghost hidden">ログアウト</button>
       </div>
 
+      <!-- Hero -->
       <div class="hero">
         <div class="hero-bubble">
-          <h1>こんにちは、HACOBITです。軽やかにいこう。</h1>
-          <div class="micro">「開始」でタイマー、「終了」で売上と件数をそっと記録。保存したら今日の合計に反映し、がんばりをちゃんと見える化するよ。</div>
+          <h1>こんにちは、HACOBITです。今日も軽やかにいこう。</h1>
+          <div class="micro">「開始」でタイマー、「終了」で売上と件数をそっと記録。保存したら今日の合計に反映して、がんばりを上品に見える化するよ。</div>
         </div>
-        <!-- 小さなラインイラスト（ブランド色） -->
         <svg width="88" height="60" viewBox="0 0 88 60" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
           <path d="M6 36 C 18 46, 42 46, 58 34" stroke="#A18291" stroke-width="4" stroke-linecap="round" fill="none"/>
           <path d="M30 12 L50 28" stroke="#B58A6C" stroke-width="4" stroke-linecap="round"/>
@@ -125,6 +250,7 @@
         </svg>
       </div>
 
+      <!-- Profile -->
       <div id="authed" class="profile hidden">
         <img id="avatar" class="avatar" alt="ユーザーのアバター" src="">
         <div class="grow">
@@ -137,12 +263,14 @@
         </span>
       </div>
 
+      <!-- Dashboard -->
       <div class="grid" aria-live="polite">
         <div class="card"><div class="label">推定時給（今日）</div><div id="wage" class="value">¥0</div></div>
         <div class="card"><div class="label">今日の件数</div><div id="orders" class="value">0</div></div>
         <div class="card"><div class="label">稼働時間（今日）</div><div id="time" class="value">0:00</div></div>
       </div>
 
+      <!-- Desktop actions -->
       <div class="actions">
         <button id="startBtn" class="chip primary">開始する</button>
         <button id="pauseBtn" class="chip">一時停止</button>
@@ -151,65 +279,89 @@
         <span class="micro">クエストは準備中</span>
       </div>
 
+      <!-- Map placeholder -->
       <div class="board">（ここにGoogleマップ / アクティビティを重ねて表示予定）</div>
+    </div>
+
+    <!-- Mobile bottom action bar -->
+    <div class="mbar" role="toolbar" aria-label="操作バー（モバイル）">
+      <button id="mStart" class="mbtn primary">開始</button>
+      <button id="mPause" class="mbtn">一時停止</button>
+      <button id="mStop"  class="mbtn">終了</button>
     </div>
 
     <!-- 保存モーダル -->
     <div id="endModal" class="modal-bg hidden" aria-hidden="true">
       <div class="modal" role="dialog" aria-modal="true" aria-labelledby="saveTitle">
         <h3 id="saveTitle">セッションを保存するね</h3>
-        <div class="field"><label for="inputSales">売上（円）</label><input id="inputSales" type="number" min="0" step="100" placeholder="例: 3500" /></div>
-        <div class="field"><label for="inputOrders">件数</label><input id="inputOrders" type="number" min="0" step="1" placeholder="例: 5" /></div>
-        <div class="right"><button id="cancelSave" class="ghost" type="button">やっぱやめる</button><button id="confirmSave" class="btn" type="button">記録しておくね</button></div>
+        <div class="field">
+          <label for="inputSales">売上（円）</label>
+          <input id="inputSales" type="number" min="0" step="100" placeholder="例: 3500" />
+        </div>
+        <div class="field">
+          <label for="inputOrders">件数</label>
+          <input id="inputOrders" type="number" min="0" step="1" placeholder="例: 5" />
+        </div>
+        <div class="right">
+          <button id="cancelSave" class="ghost" type="button">やっぱやめる</button>
+          <button id="confirmSave" class="btn" type="button">記録しておくね</button>
+        </div>
       </div>
     </div>
 
-    <!-- 成功トースト（HACOBIT入り） -->
-    <div id="toast" class="toast hidden" role="status" aria-live="polite">
-      <!-- HACOBIT inline SVG (1:1, 128x128 viewbox subset) -->
-      <svg id="hb" width="40" height="40" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="HACOBIT success pose">
-        <defs>
-          <!-- soft drop shadow: y=1.5px, blur=4px, opacity=12% -->
-          <filter id="hbShadow" x="-50%" y="-50%" width="200%" height="200%">
-            <feOffset dx="0" dy="1.5" in="SourceAlpha" result="off"/>
-            <feGaussianBlur in="off" stdDeviation="4" result="blur"/>
-            <feComponentTransfer in="blur" result="shadow">
-              <feFuncA type="linear" slope="0.12"/>
-            </feComponentTransfer>
-            <feMerge><feMergeNode in="shadow"/><feMergeNode in="SourceGraphic"/></feMerge>
-          </filter>
-        </defs>
-        <g id="hb_group" filter="url(#hbShadow)" stroke="#413D4B" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-          <!-- shadow ellipse (subtle) -->
-          <!-- body -->
-          <g id="hb_body">
-            <rect x="176" y="180" rx="24" ry="24" width="160" height="160" fill="#F6F4F2"/>
-            <!-- left arm (rest) -->
-            <path d="M176 230 C 150 240, 150 280, 176 292" fill="none"/>
-          </g>
-          <!-- right arm (animated) -->
-          <g id="hb_armR">
-            <path d="M336 230 C 362 240, 362 280, 336 292" fill="none"/>
-          </g>
-          <!-- scarf (accent) -->
-          <g id="hb_scarf">
-            <path d="M256 300 C 276 296, 296 296, 312 302" fill="none" stroke="#A18291"/>
-            <path d="M312 302 C 318 305, 320 312, 314 318" fill="none" stroke="#B58A6C"/>
-          </g>
-          <!-- eyes -->
-          <g id="hb_eyes" transform="translate(0,0)">
-            <circle cx="228" cy="240" r="6" fill="#413D4B"/>
-            <circle cx="284" cy="240" r="6" fill="#413D4B"/>
-            <path d="M230 265 h20" stroke="#413D4B" />
-          </g>
-          <!-- tiny accent (seal) -->
-          <rect x="248" y="332" width="16" height="12" rx="2" fill="#B58A6C"/>
-        </g>
-      </svg>
-      <span id="toastMsg">保存しました。今日もいい流れ！</span>
+    <!-- 成功トースト（テキストのみ。アニメは常駐HACOBITへ） -->
+    <div id="toast" class="toast hidden" role="status" aria-live="polite">保存しました。今日もいい流れ！</div>
+
+    <!-- HACOBIT Dock（常駐） -->
+    <div class="hb-dock" aria-live="polite">
+      <div id="hbBubble" class="hb-bubble hidden">こんにちは、準備OKだよ。</div>
+      <button id="hbBtn" class="hb-touch" aria-label="HACOBITと会話">
+        <div class="hb-wrap">
+          <!-- Inline SVG: line=#413D4B 2.5px, base #F6F4F2, accents small, tiny drop shadow -->
+          <svg id="hbMain" class="idle" width="72" height="72" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="HACOBIT">
+            <defs>
+              <filter id="hbShadow" x="-50%" y="-50%" width="200%" height="200%">
+                <feOffset dx="0" dy="1.5" in="SourceAlpha" result="off"/>
+                <feGaussianBlur in="off" stdDeviation="4" result="blur"/>
+                <feComponentTransfer in="blur" result="shadow">
+                  <feFuncA type="linear" slope="0.12"/>
+                </feComponentTransfer>
+                <feMerge><feMergeNode in="shadow"/><feMergeNode in="SourceGraphic"/></feMerge>
+              </filter>
+            </defs>
+            <g id="hb_group" filter="url(#hbShadow)" stroke="#413D4B" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <!-- body -->
+              <g id="hb_body">
+                <rect x="176" y="180" rx="24" ry="24" width="160" height="160" fill="#F6F4F2"/>
+                <!-- left arm -->
+                <path d="M176 230 C 150 240, 150 280, 176 292" fill="none"/>
+              </g>
+              <!-- right arm (animated when play) -->
+              <g id="hb_armR">
+                <path d="M336 230 C 362 240, 362 280, 336 292" fill="none"/>
+              </g>
+              <!-- scarf (primary & accent small) -->
+              <g id="hb_scarf">
+                <path d="M256 300 C 276 296, 296 296, 312 302" fill="none" stroke="#A18291"/>
+                <path d="M312 302 C 318 305, 320 312, 314 318" fill="none" stroke="#B58A6C"/>
+              </g>
+              <!-- eyes & mouth -->
+              <g id="hb_eyes" transform="translate(0,0)">
+                <circle cx="228" cy="240" r="6" fill="#413D4B"/>
+                <circle cx="284" cy="240" r="6" fill="#413D4B"/>
+                <path d="M230 265 h20" stroke="#413D4B" />
+              </g>
+              <!-- small seal -->
+              <rect x="248" y="332" width="16" height="12" rx="2" fill="#B58A6C"/>
+            </g>
+          </svg>
+        </div>
+      </button>
     </div>
 
+    <!-- Firebase + App logic -->
     <script type="module">
+      // ==== Firebase Config（あなたの値） ====
       const firebaseConfig = {
         apiKey: "AIzaSyA8x75S7gx0vF4CtENATZO0Spnn33t_Oyg",
         authDomain: "jikyuu-hacker.firebaseapp.com",
@@ -220,10 +372,18 @@
         measurementId: "G-B85Q3TRR6V"
       };
 
+      // ==== SDK v11（modular, CDN） ====
       import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
       import {
-        initializeAuth, indexedDBLocalPersistence, browserLocalPersistence, browserPopupRedirectResolver,
-        GoogleAuthProvider, onAuthStateChanged, signInWithPopup, signInWithRedirect, signOut
+        initializeAuth,
+        indexedDBLocalPersistence,
+        browserLocalPersistence,
+        browserPopupRedirectResolver,
+        GoogleAuthProvider,
+        onAuthStateChanged,
+        signInWithPopup,
+        signInWithRedirect,
+        signOut
       } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
       import {
         getFirestore, collection, addDoc, updateDoc, serverTimestamp,
@@ -231,6 +391,7 @@
       } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
       import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-analytics.js";
 
+      // --- App init ---
       const app = initializeApp(firebaseConfig);
       try{ getAnalytics(app); }catch(_){}
 
@@ -242,59 +403,120 @@
       const provider = new GoogleAuthProvider();
       const db = getFirestore(app);
 
+      // --- DOM utils ---
       const $ = (id)=>document.getElementById(id);
       const show = (el)=>{ el.classList.remove("hidden"); el.setAttribute("aria-hidden","false"); };
       const hide = (el)=>{ el.classList.add("hidden"); el.setAttribute("aria-hidden","true"); };
       const pad2=(n)=>String(n).padStart(2,"0");
       const fmtHMM=(sec)=>{const h=Math.floor(sec/3600),m=Math.floor((sec%3600)/60);return `${h}:${pad2(m)}`;}
 
+      // --- State ---
       let signingIn=false,timerId=null,seconds=0,earned=0,orders=0,currentSessionRef=null,startedAtMs=null,unsubscribeToday=null;
 
-      // HACOBITトースト
-      const playHacobit = (msg="保存しました。今日もいい流れ！")=>{
-        $("toastMsg").textContent = msg;
-        const toast = $("toast"); const hb = $("hb");
-        toast.classList.remove("hidden");
-        // 再生のため一旦リセット
+      // ---- HACOBIT behavior (always-on) ----
+      const hb = $("hbMain");
+      const hbBubble = $("hbBubble");
+      const microcopies = [
+        "準備OKだよ。", "いい波、来てる。", "そっとブーストしておくね。",
+        "深呼吸してから、いこう。", "そのペース、いい手触り。", "水分補給、忘れずに。",
+        "今日の山場はここ。", "軽やかに、ね。", "受け取りましたっ。"
+      ];
+      function say(text){
+        hbBubble.textContent = text;
+        hbBubble.classList.remove("hidden");
+        clearTimeout(say._t);
+        say._t = setTimeout(()=> hbBubble.classList.add("hidden"), 2500);
+      }
+      // idle blink loop（3.5〜6.0秒に一度）
+      function scheduleBlink(){
+        const next = 3500 + Math.random()*2500;
+        setTimeout(()=>{
+          hb.classList.add("blink");
+          // force restart
+          void hb.offsetWidth;
+          hb.classList.remove("blink"); // blink keyframe is 'to', so toggle quickly
+          scheduleBlink();
+        }, next);
+      }
+      scheduleBlink();
+      // click to greet / wave (also runs success pose)
+      $("hbBtn").addEventListener("click", ()=>{
+        say(microcopies[Math.floor(Math.random()*microcopies.length)]);
+        // success pose play
         hb.classList.remove("play"); void hb.offsetWidth; hb.classList.add("play");
-        setTimeout(()=> toast.classList.add("hidden"), 1800);
+      });
+
+      // ---- Toast helper (text only; mascot animates separately) ----
+      const showToast = (msg)=>{
+        const t=$("toast"); t.textContent=msg; t.classList.remove("hidden");
+        setTimeout(()=> t.classList.add("hidden"), 1800);
+        // celebrate with HACOBIT
+        hb.classList.remove("play"); void hb.offsetWidth; hb.classList.add("play");
       };
 
+      // ---- Auth ----
       $("signinBtn").addEventListener("click", async ()=>{
         if(signingIn) return; signingIn=true; $("signinBtn").disabled=true;
         try{ await signInWithPopup(auth, provider); }
-        catch(e){ const msg=String(e?.message||"");
-          if(e?.code==="auth/popup-blocked"||msg.includes("Pending promise")) await signInWithRedirect(auth, provider);
-          else alert("ログインに失敗しました: "+(e?.message||e));
+        catch(e){
+          const msg=String(e?.message||"");
+          if(e?.code==="auth/popup-blocked"||msg.includes("Pending promise")){
+            await signInWithRedirect(auth, provider);
+          } else {
+            alert("ログインに失敗しました: " + (e?.message || e));
+          }
         } finally { signingIn=false; $("signinBtn").disabled=false; }
       });
       $("signoutBtn").addEventListener("click", async ()=>{ await signOut(auth); });
 
-      function tick(){ seconds+=5; $("time").textContent=fmtHMM(seconds);
-        $("wage").textContent=`¥${(seconds?Math.round((earned/(seconds/3600))):0).toLocaleString()}`; $("orders").textContent=String(orders); }
+      // ---- Timer visuals ----
+      function tick(){
+        seconds+=5;
+        $("time").textContent = fmtHMM(seconds);
+        $("wage").textContent = `¥${(seconds? Math.round((earned/(seconds/3600))) : 0).toLocaleString()}`;
+        $("orders").textContent = String(orders);
+      }
 
-      $("startBtn").addEventListener("click", async ()=>{
+      async function startSession(){
         if(!auth.currentUser){ alert("先にログインしてね"); return; }
         if(timerId||currentSessionRef) return;
         const uid=auth.currentUser.uid;
         const col=collection(db,"users",uid,"work_sessions");
         currentSessionRef=await addDoc(col,{
-          status:"running", startTime:serverTimestamp(), endTime:null,
-          ordersCount:0, grossSales:0, areaGeohash:null, areaLabel:null,
-          createdAt:serverTimestamp(), updatedAt:serverTimestamp()
+          status:"running",
+          startTime:serverTimestamp(),
+          endTime:null,
+          ordersCount:0,
+          grossSales:0,
+          areaGeohash:null,
+          areaLabel:null,
+          createdAt:serverTimestamp(),
+          updatedAt:serverTimestamp()
         });
-        startedAtMs=Date.now(); timerId=setInterval(tick,5000);
-        playHacobit("タイマー開始。いい感じ！");
-      });
-
-      $("pauseBtn").addEventListener("click", ()=>{ if(timerId){ clearInterval(timerId); timerId=null; playHacobit("一時停止中。水分補給してね"); }});
-
-      $("stopBtn").addEventListener("click", ()=>{
+        startedAtMs=Date.now();
+        timerId=setInterval(tick,5000);
+        showToast("タイマー開始。いい感じ！");
+        say("任せて。");
+      }
+      function pauseSession(){
+        if(timerId){ clearInterval(timerId); timerId=null; showToast("一時停止中。水分補給してね"); }
+      }
+      function requestEnd(){
         if(!auth.currentUser){ alert("先にログインしてね"); return; }
         if(!currentSessionRef){ alert("まずは開始しよう"); return; }
         show($("endModal")); $("inputSales").focus();
-      });
+      }
 
+      // Desktop actions
+      $("startBtn").addEventListener("click", startSession);
+      $("pauseBtn").addEventListener("click", pauseSession);
+      $("stopBtn").addEventListener("click", requestEnd);
+      // Mobile bar actions
+      $("mStart").addEventListener("click", startSession);
+      $("mPause").addEventListener("click", pauseSession);
+      $("mStop").addEventListener("click", requestEnd);
+
+      // ---- Modal controls ----
       $("endModal").addEventListener("click",(e)=>{ if(e.target.id==="endModal") hide($("endModal")); });
       document.addEventListener("keydown",(e)=>{ if(e.key==="Escape") hide($("endModal")); });
       $("cancelSave").addEventListener("click",()=> hide($("endModal")));
@@ -302,25 +524,49 @@
       $("confirmSave").addEventListener("click", async ()=>{
         if(!auth.currentUser){ hide($("endModal")); return; }
         if(!currentSessionRef){ hide($("endModal")); return; }
-        const sales=Number($("inputSales").value||0); const cnt=Number($("inputOrders").value||0);
-        if(!Number.isFinite(sales)||sales<0||!Number.isFinite(cnt)||cnt<0){ alert("数値を正しく入力してね"); return; }
+
+        const sales=Number($("inputSales").value||0);
+        const cnt=Number($("inputOrders").value||0);
+        if(!Number.isFinite(sales)||sales<0||!Number.isFinite(cnt)||cnt<0){
+          alert("数値を正しく入力してね"); return;
+        }
+
         earned=sales; orders=cnt;
         const durationSec=Math.max(1, Math.round((Date.now()-(startedAtMs||Date.now()))/1000));
-        const hours=durationSec/3600; const hourly=hours>0? Math.round(sales/hours):0;
+        const hours=durationSec/3600;
+        const hourly=hours>0? Math.round(sales/hours):0;
+
         try{
           await updateDoc(currentSessionRef,{
-            status:"ended", endTime:serverTimestamp(), ordersCount:cnt, grossSales:sales,
-            durationSec, hourlyWage:hourly, updatedAt:serverTimestamp()
+            status:"ended",
+            endTime:serverTimestamp(),
+            ordersCount:cnt,
+            grossSales:sales,
+            durationSec,
+            hourlyWage:hourly,
+            updatedAt:serverTimestamp()
           });
           const best=Number(localStorage.getItem("bestHourly")||0);
-          if(hourly>best){ localStorage.setItem("bestHourly", String(hourly)); playHacobit("すごい！新記録！"); }
-          else{ playHacobit("保存しました。おつかれさま！"); }
-        }catch(err){ alert("保存に失敗しました: "+(err?.message||err)); }
-        finally{ hide($("endModal")); }
+          if(hourly>best){
+            localStorage.setItem("bestHourly", String(hourly));
+            showToast("すごい！新記録！");
+            say("お見事。");
+          }else{
+            showToast("保存しました。おつかれさま！");
+            say("よくがんばった。");
+          }
+        }catch(err){
+          alert("保存に失敗しました: " + (err?.message || err));
+          return;
+        }finally{
+          hide($("endModal"));
+        }
+
         if(timerId){ clearInterval(timerId); timerId=null; }
         seconds=0; earned=0; orders=0; currentSessionRef=null; startedAtMs=null;
       });
 
+      // ---- Live "today" totals (status=ended, last 50, client-side day filter) ----
       function startTodayListener(uid){
         if(unsubscribeToday){ unsubscribeToday(); unsubscribeToday=null; }
         const startOfDay=new Date(); startOfDay.setHours(0,0,0,0);
@@ -329,9 +575,12 @@
         const q=query(col, where("status","==","ended"), orderBy("startTime","desc"), limit(50));
         unsubscribeToday = onSnapshot(q,(snap)=>{
           let totalSales=0,totalOrders=0,totalSec=0;
-          snap.forEach(d=>{ const v=d.data(); if(!v.startTime) return;
+          snap.forEach(d=>{
+            const v=d.data(); if(!v.startTime) return;
             if(v.startTime.toMillis()<startTs.toMillis()) return;
-            totalSales+=Number(v.grossSales||0); totalOrders+=Number(v.ordersCount||0); totalSec+=Number(v.durationSec||0);
+            totalSales+=Number(v.grossSales||0);
+            totalOrders+=Number(v.ordersCount||0);
+            totalSec+=Number(v.durationSec||0);
           });
           const hourly= totalSec>0 ? Math.round(totalSales/(totalSec/3600)) : 0;
           $("wage").textContent=`¥${hourly.toLocaleString()}`;
@@ -347,12 +596,14 @@
           $("avatar").src=user.photoURL || "";
           show($("authed")); show($("signoutBtn")); hide($("signinBtn"));
           startTodayListener(user.uid);
-        }else{
+          say(`ようこそ、${user.displayName||"配達員さん"}。`);
+        } else {
           hide($("endModal")); hide($("authed")); hide($("signoutBtn")); show($("signinBtn"));
           if(unsubscribeToday){ unsubscribeToday(); unsubscribeToday=null; }
           if(timerId){ clearInterval(timerId); timerId=null; }
           seconds=0; earned=0; orders=0; currentSessionRef=null; startedAtMs=null;
           $("wage").textContent="¥0"; $("orders").textContent="0"; $("time").textContent="0:00";
+          say("ログインしてはじめよう。");
         }
       });
     </script>
