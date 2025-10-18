@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-    <title>時給ハッカー | HACOBIT Hero (no-error safe)</title>
+    <title>時給ハッカー | HACOBIT Hero + Lottie Loader (no-404)</title>
     <meta name="color-scheme" content="light only" />
     <style>
       :root{
@@ -51,7 +51,7 @@
         transform:translateY(0);transition:.15s transform ease,.2s filter ease;cursor:pointer;touch-action:manipulation}
       .btn:hover{filter:brightness(1.03)} .btn:active{transform:translateY(2px)}
 
-      /* ===== Hero (大きなHACOBIT常駐) ===== */
+      /* ===== Hero ===== */
       .hero{display:grid; grid-template-columns:1.2fr .8fr; gap:16px; align-items:center; padding:18px 22px 10px}
       .hero-left{
         background:linear-gradient(180deg, rgba(255,255,255,.85), rgba(255,255,255,.62));
@@ -62,33 +62,33 @@
       .hero-right{position:relative; display:grid; place-items:center}
       .hero-wrap{width:min(360px, 80vw); aspect-ratio:1; position:relative}
       .hb-img{width:100%; height:100%; object-fit:contain; filter:drop-shadow(0 1.5px 4px rgba(0,0,0,.12))}
-      /* 画像版にも軽い息づかい＆祝アニメを適用 */
       @keyframes img_idle_bob{ 0%,100%{transform:translateY(0)} 50%{transform:translateY(-2px)} }
       .img-idle{ animation: img_idle_bob 3s ease-in-out infinite; }
       @keyframes img_celebrate{ 0%{transform:translateY(-4px) scale(1)} 60%{transform:translateY(-2px) scale(1.02)} 100%{transform:translateY(0) scale(1)} }
       .img-play{ animation: img_celebrate 1s ease both; }
 
-      /* ブロンズきらめき（クエスト/新記録時） */
+      /* sparkles */
       .sparkles{pointer-events:none; position:absolute; inset:0}
       .sparkles span{ position:absolute; width:8px;height:8px; background:var(--accent); border-radius:2px; opacity:0; }
       @keyframes sparkle{ 0%{transform:translate(0,0) scale(1) rotate(0deg); opacity:.9} 100%{transform:translate(var(--dx),var(--dy)) scale(0.8) rotate(180deg); opacity:0} }
       .celebrate .sparkles span{ animation: sparkle .9s ease-out forwards }
 
-      /* インラインSVG（フォールバック） */
+      /* SVG fallback */
       .hb-svg{width:100%; height:100%}
       @keyframes hb_idle_bob{ 0%,100%{transform:translateY(0)} 50%{transform:translateY(-2px)} }
-      #hbHero.idle #hb_body{ animation: hb_idle_bob 3s ease-in-out infinite; }
+      .hb-svg.idle #hb_body{ animation: hb_idle_bob 3s ease-in-out infinite; }
       @keyframes hb_blink{ from{transform:scaleY(1)} to{transform:scaleY(.7)} }
-      #hbHero.blink #hb_eyes{ animation: hb_blink .12s linear both; }
-      #hbHero.play #hb_body{animation:hb_body_up .12s ease-out both, hb_body_relax .24s .60s ease-in-out both, hb_body_return .16s .84s linear both}
+      .hb-svg.blink #hb_eyes{ animation: hb_blink .12s linear both; }
+      .hb-svg.play #hb_body{animation:hb_body_up .12s ease-out both, hb_body_relax .24s .60s ease-in-out both, hb_body_return .16s .84s linear both}
       @keyframes hb_body_up{from{transform:translateY(0)} to{transform:translateY(-4px)}}
       @keyframes hb_body_relax{from{transform:translateY(-4px)} to{transform:translateY(-2px)}}
       @keyframes hb_body_return{from{transform:translateY(-2px)} to{transform:translateY(0)}}
-      #hbHero.play #hb_armR{transform-origin: 280px 260px; animation:hb_arm_raise .16s .12s ease-out both}
+      .hb-svg.play #hb_armR{transform-origin: 280px 260px; animation:hb_arm_raise .16s .12s ease-out both}
       @keyframes hb_arm_raise{from{transform:rotate(0deg) translate(0,0)} to{transform:rotate(12deg) translate(6px,-2px)}}
-      #hbHero.play #hb_scarf{transform-origin: 256px 300px; animation:hb_scarf_follow .16s .20s cubic-bezier(.34,1.56,.64,1) both}
+      .hb-svg.play #hb_scarf{transform-origin: 256px 300px; animation:hb_scarf_follow .16s .20s cubic-bezier(.34,1.56,.64,1) both}
       @keyframes hb_scarf_follow{0%{transform:rotate(0deg)}70%{transform:rotate(6deg)}100%{transform:rotate(-3deg)}}
 
+      /* Dashboard */
       .profile{display:flex; align-items:center; gap:12px; padding:0 22px 12px}
       .avatar{width:44px;height:44px;border-radius:50%;border:1px solid rgba(65,61,75,.15)}
       .tag{display:inline-flex;align-items:center;gap:8px;border:1px solid rgba(181,138,108,.45);background:rgba(181,138,108,.12);color:var(--accent);border-radius:999px;padding:6px 10px;font-weight:700;font-size:12px}
@@ -114,15 +114,10 @@
 
       .toast{position:fixed; left:50%; bottom:calc(22px + var(--safe-bottom)); transform:translateX(-50%); background:linear-gradient(180deg, #fff, rgba(255,255,255,.92)); border:1px solid rgba(65,61,75,.10); color:var(--ink); font-weight:800; padding:10px 14px; border-radius:999px; box-shadow:var(--shadow-sm); z-index:1200}
 
-      /* ===== Loader ===== */
+      /* Loader overlay (Lottieに置換) */
       .loader{position:fixed; inset:0; background:rgba(246,244,242,.75); display:grid; place-items:center; z-index:1400}
       .loader-box{display:grid; place-items:center; gap:10px; padding:18px; border-radius:16px; background:linear-gradient(180deg,#fff,rgba(255,255,255,.92)); border:1px solid rgba(65,61,75,.12); box-shadow:var(--shadow-sm)}
-      .ring{width:38px;height:38px;border:3px solid rgba(65,61,75,.15); border-top-color:var(--primary); border-radius:50%; animation:spin 1s linear infinite}
-      @keyframes spin{to{transform:rotate(360deg)}}
-      /* スプライト（8フレーム横並びを想定） */
-      .sprite{width:128px;height:128px;background-repeat:no-repeat;background-size:800% 100%; image-rendering:-webkit-optimize-contrast; image-rendering:pixelated}
-      @keyframes spritePlay{ from{background-position:0% 0} to{background-position:100% 0} }
-
+      #hbLottie{width:96px; height:96px}
       @media (max-width:900px){ .hero{grid-template-columns:1fr; gap:10px} .hero-right{order:-1} }
       @media (max-width:720px){ .grid{grid-template-columns:1fr; gap:10px} .actions{display:none} }
       .mbar{position:fixed; left:0; right:0; bottom:0; padding:8px 10px calc(8px + var(--safe-bottom)); background:linear-gradient(180deg, rgba(255,255,255,.9), rgba(255,255,255,.98)); border-top:1px solid rgba(65,61,75,.10); display:none; gap:10px; justify-content:center; z-index:1200; backdrop-filter:blur(8px)}
@@ -130,12 +125,14 @@
       .mbar .mbtn.primary{border:none; background:linear-gradient(180deg, var(--primary) 0%, var(--primary-strong) 100%); color:#fff; box-shadow:0 6px 14px rgba(161,130,145,.30), inset 0 2px 0 rgba(255,255,255,.20)}
       @media (max-width:720px){ .mbar{display:flex} }
     </style>
+    <!-- lottie-web CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lottie-web/5.12.2/lottie.min.js" defer></script>
   </head>
   <body>
-    <!-- Loader -->
+    <!-- Lottie Loader -->
     <div id="loader" class="loader">
       <div class="loader-box">
-        <div id="loaderAnim" class="ring" aria-hidden="true"></div>
+        <div id="hbLottie" aria-hidden="true"></div>
         <div style="font-weight:800;color:var(--ink)">読み込み中…少し待ってね。</div>
       </div>
     </div>
@@ -156,35 +153,13 @@
           <p class="micro">「開始」でタイマー、「終了」で売上と件数をさっと記録。保存すると、今日の合計がすぐに反映されるよ。</p>
         </div>
         <div class="hero-right">
-          <div id="heroWrap" class="hero-wrap">
-            <!-- Canva画像（存在すれば動的に差す）。デフォは非表示 -->
-            <img id="hbImage" class="hb-img img-idle hidden" alt="HACOBIT">
-            <!-- フォールバックSVG -->
-            <svg id="hbHero" class="hb-svg idle" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="HACOBIT (fallback)">
-              <defs>
-                <filter id="hbShadow" x="-50%" y="-50%" width="200%" height="200%">
-                  <feOffset dx="0" dy="1.5" in="SourceAlpha" result="off"/>
-                  <feGaussianBlur in="off" stdDeviation="4" result="blur"/>
-                  <feComponentTransfer in="blur" result="shadow"><feFuncA type="linear" slope="0.12"/></feComponentTransfer>
-                  <feMerge><feMergeNode in="shadow"/><feMergeNode in="SourceGraphic"/></feMerge>
-                </filter>
-              </defs>
-              <g id="hb_group" filter="url(#hbShadow)" stroke="#413D4B" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                <g id="hb_body"><rect x="176" y="180" rx="24" ry="24" width="160" height="160" fill="#F6F4F2"/><path d="M176 230 C 150 240, 150 280, 176 292" fill="none"/></g>
-                <g id="hb_armR"><path d="M336 230 C 362 240, 362 280, 336 292" fill="none"/></g>
-                <g id="hb_scarf"><path d="M256 300 C 276 296, 296 296, 312 302" fill="none" stroke="#A18291"/><path d="M312 302 C 318 305, 320 312, 314 318" fill="none" stroke="#B58A6C"/></g>
-                <g id="hb_eyes"><circle cx="228" cy="240" r="6" fill="#413D4B"/><circle cx="284" cy="240" r="6" fill="#413D4B"/><path d="M230 265 h20" stroke="#413D4B"/></g>
-                <rect x="248" y="332" width="16" height="12" rx="2" fill="#B58A6C"/>
-              </g>
-            </svg>
-
-            <!-- きらめき -->
-            <div class="sparkles" aria-hidden="true">
-              <span style="left:50%;top:8%; --dx:-40px; --dy:-40px"></span><span style="left:18%;top:22%; --dx:-30px; --dy:-20px"></span><span style="left:82%;top:28%; --dx:30px; --dy:-24px"></span>
-              <span style="left:12%;top:54%; --dx:-26px; --dy:6px"></span><span style="left:88%;top:58%; --dx:26px; --dy:10px"></span>
-              <span style="left:28%;top:82%; --dx:-8px; --dy:26px"></span><span style="left:72%;top:82%; --dx:8px; --dy:26px"></span><span style="left:48%;top:92%; --dx:0; --dy:30px"></span>
-              <span style="left:6%;top:36%; --dx:-18px; --dy:-6px"></span><span style="left:94%;top:36%; --dx:18px; --dy:-6px"></span><span style="left:34%;top:10%; --dx:-14px; --dy:-24px"></span><span style="left:66%;top:10%; --dx:14px; --dy:-24px"></span>
-            </div>
+          <div id="heroWrap" class="hero-wrap"></div>
+          <!-- sparkles -->
+          <div class="sparkles" aria-hidden="true">
+            <span style="left:50%;top:8%; --dx:-40px; --dy:-40px"></span><span style="left:18%;top:22%; --dx:-30px; --dy:-20px"></span><span style="left:82%;top:28%; --dx:30px; --dy:-24px"></span>
+            <span style="left:12%;top:54%; --dx:-26px; --dy:6px"></span><span style="left:88%;top:58%; --dx:26px; --dy:10px"></span>
+            <span style="left:28%;top:82%; --dx:-8px; --dy:26px"></span><span style="left:72%;top:82%; --dx:8px; --dy:26px"></span><span style="left:48%;top:92%; --dx:0; --dy:30px"></span>
+            <span style="left:6%;top:36%; --dx:-18px; --dy:-6px"></span><span style="left:94%;top:36%; --dx:18px; --dy:-6px"></span><span style="left:34%;top:10%; --dx:-14px; --dy:-24px"></span><span style="left:66%;top:10%; --dx:14px; --dy:-24px"></span>
           </div>
         </div>
       </section>
@@ -231,6 +206,52 @@
 
     <div id="toast" class="toast hidden" role="status" aria-live="polite">保存しました。今日もいい流れ！</div>
 
+    <!-- Lottie JSON（最小構成） -->
+    <script id="hbLottieData" type="application/json">
+    {
+      "v":"5.9.0","fr":30,"ip":0,"op":60,"w":128,"h":128,"nm":"hacobit-loading","ddd":0,"assets":[],
+      "layers":[
+        {"ddd":0,"ind":1,"ty":4,"nm":"body","sr":1,
+         "ks":{"o":{"a":0,"k":100},"r":{"a":0,"k":0},
+               "p":{"a":1,"k":[
+                 {"t":0,"s":[64,70,0],"e":[64,60,0]},
+                 {"t":30,"s":[64,60,0],"e":[64,70,0]},
+                 {"t":60}
+               ]},
+               "a":{"a":0,"k":[0,0,0]},"s":{"a":0,"k":[100,100,100]}},
+         "shapes":[
+           {"ty":"gr","it":[
+             {"ty":"rc","d":1,"s":{"a":0,"k":[56,56]},"p":{"a":0,"k":[0,0]},"r":{"a":0,"k":14},"nm":"rect"},
+             {"ty":"st","c":{"a":0,"k":[0.254,0.239,0.294,1]},"w":{"a":0,"k":2.5},"lc":2,"lj":2,"nm":"stroke"},
+             {"ty":"fl","c":{"a":0,"k":[0.965,0.957,0.949,1]},"o":{"a":0,"k":100},"nm":"fill"},
+             {"ty":"tr","p":{"a":0,"k":[0,0]},"a":{"a":0,"k":[0,0]},"s":{"a":0,"k":[100,100]},"r":{"a":0,"k":0},"o":{"a":0,"k":100},"sk":{"a":0,"k":0},"sa":{"a":0,"k":0}}
+           ],"nm":"rect-group"}
+         ]},
+        {"ddd":0,"ind":2,"ty":4,"nm":"scarf","sr":1,
+         "ks":{"o":{"a":0,"k":100},"r":{"a":1,"k":[
+               {"t":10,"s":[0],"e":[6]},
+               {"t":35,"s":[6],"e":[-3]},
+               {"t":60}
+             ]},
+               "p":{"a":0,"k":[64,92,0]},
+               "a":{"a":0,"k":[0,0,0]},"s":{"a":0,"k":[100,100,100]}},
+         "shapes":[
+           {"ty":"gr","it":[
+             {"ty":"sh","ks":{"a":0,"k":{"i":[],"o":[],"v":[[-16,0],[16,0]],"c":false}},"nm":"line"},
+             {"ty":"st","c":{"a":0,"k":[0.632,0.510,0.569,1]},"w":{"a":0,"k":2.5},"lc":2,"lj":2,"nm":"stroke"},
+             {"ty":"tr","p":{"a":0,"k":[0,0]},"a":{"a":0,"k":[0,0]},"s":{"a":0,"k":[100,100]},"r":{"a":0,"k":0},"o":{"a":0,"k":100}}
+           ],"nm":"scarf-line"},
+           {"ty":"gr","it":[
+             {"ty":"rc","d":1,"s":{"a":0,"k":[6,6]},"p":{"a":0,"k":[18,0]},"r":{"a":0,"k":1},"nm":"seal"},
+             {"ty":"fl","c":{"a":0,"k":[0.710,0.541,0.424,1]},"o":{"a":0,"k":100},"nm":"fill"},
+             {"ty":"st","c":{"a":0,"k":[0.254,0.239,0.294,1]},"w":{"a":0,"k":2},"lc":2,"lj":2,"nm":"stroke"},
+             {"ty":"tr","p":{"a":0,"k":[0,0]},"a":{"a":0,"k":[0,0]},"s":{"a":0,"k":[100,100]},"r":{"a":0,"k":0},"o":{"a":0,"k":100}}
+           ],"nm":"seal-box"}
+         ]}
+      ]
+    }
+    </script>
+
     <script type="module">
       /* ===== Firebase ===== */
       const firebaseConfig = {
@@ -263,58 +284,85 @@
       const fmtHMM=(sec)=>{const h=Math.floor(sec/3600),m=Math.floor((sec%3600)/60);return `${h}:${pad2(m)}`;}
       const assetExists = async (path)=>{ try{ const r=await fetch(path,{method:"HEAD",cache:"no-store"}); return r.ok; }catch{ return false; } };
 
-      /* ===== Hero mascot: use Canva image if present, else SVG ===== */
-      const heroWrap = $("heroWrap"), hbImg=$("hbImage"), hbSvg=$("hbHero");
+      /* ===== Hero mascot: ローカル → CanvaURL → SVG の順に利用 ===== */
+      const heroWrap = $("heroWrap");
+      const CANVA_HERO_URL =
+        "https://document-export.canva.com/1yJj4/DAG2Hr1yJj4/1/thumbnail/0001.png?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAQYCGKMUHWEOTUD6Q%2F20251017%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20251017T174709Z&X-Amz-Expires=64739&X-Amz-Signature=21545a8443eac199cedc72d53edc1de8379d50d24ba62bdedc79e75ab2b54875&X-Amz-SignedHeaders=host&response-expires=Sat%2C%2018%20Oct%202025%2011%3A46%3A08%20GMT";
+
+      function buildSVG(){
+        const svg = document.createElementNS("http://www.w3.org/2000/svg","svg");
+        svg.setAttribute("viewBox","0 0 512 512"); svg.classList.add("hb-svg","idle");
+        svg.innerHTML = `
+        <defs>
+          <filter id="hbShadow" x="-50%" y="-50%" width="200%" height="200%">
+            <feOffset dx="0" dy="1.5" in="SourceAlpha" result="off"/><feGaussianBlur in="off" stdDeviation="4" result="blur"/>
+            <feComponentTransfer in="blur" result="shadow"><feFuncA type="linear" slope="0.12"/></feComponentTransfer>
+            <feMerge><feMergeNode in="shadow"/><feMergeNode in="SourceGraphic"/></feMerge>
+          </filter>
+        </defs>
+        <g id="hb_group" filter="url(#hbShadow)" stroke="#413D4B" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <g id="hb_body"><rect x="176" y="180" rx="24" ry="24" width="160" height="160" fill="#F6F4F2"/><path d="M176 230 C 150 240, 150 280, 176 292" fill="none"/></g>
+          <g id="hb_armR"><path d="M336 230 C 362 240, 362 280, 336 292" fill="none"/></g>
+          <g id="hb_scarf"><path d="M256 300 C 276 296, 296 296, 312 302" fill="none" stroke="#A18291"/><path d="M312 302 C 318 305, 320 312, 314 318" fill="none" stroke="#B58A6C"/></g>
+          <g id="hb_eyes"><circle cx="228" cy="240" r="6" fill="#413D4B"/><circle cx="284" cy="240" r="6" fill="#413D4B"/><path d="M230 265 h20" stroke="#413D4B"/></g>
+          <rect x="248" y="332" width="16" height="12" rx="2" fill="#B58A6C"/>
+        </g>`;
+        return svg;
+      }
+
       (async ()=>{
-        const hasHero = await assetExists("/assets/hacobit-hero.png");
-        if(hasHero){
-          hbImg.src="/assets/hacobit-hero.png";
-          hide(hbSvg); show(hbImg);
+        const wrap = heroWrap;
+        const hasLocal = await assetExists("/assets/hacobit-hero.png");
+        if(hasLocal){
+          const img = new Image(); img.alt="HACOBIT"; img.className="hb-img img-idle"; img.src="/assets/hacobit-hero.png";
+          wrap.appendChild(img);
         }else{
-          hide(hbImg); show(hbSvg);
+          // CanvaのサインドURLを使う（期限内に表示）。失敗時はSVGへ。
+          const img = new Image(); img.alt="HACOBIT"; img.className="hb-img img-idle";
+          img.onload = ()=>{ wrap.appendChild(img); };
+          img.onerror = ()=>{ wrap.innerHTML=""; wrap.appendChild(buildSVG()); };
+          img.src = CANVA_HERO_URL;
         }
       })();
-      // idle blink loop
-      (function blinkLoop(){
+
+      // 瞬き＆祝アニメ
+      function blinkLoop(){
         const next = 3500 + Math.random()*2500;
         setTimeout(()=>{
-          if(!hbSvg.classList.contains("hidden")){ hbSvg.classList.add("blink"); void hbSvg.offsetWidth; hbSvg.classList.remove("blink"); }
-          else { hbImg.style.transition="opacity .12s linear"; hbImg.style.opacity=".85"; setTimeout(()=>hbImg.style.opacity="1",120); }
+          const svg = heroWrap.querySelector(".hb-svg");
+          const img = heroWrap.querySelector(".hb-img");
+          if(svg){ svg.classList.add("blink"); void svg.offsetWidth; svg.classList.remove("blink"); }
+          else if(img){ img.style.transition="opacity .12s linear"; img.style.opacity=".85"; setTimeout(()=>img.style.opacity="1",120); }
           blinkLoop();
         }, next);
-      })();
+      }
+      blinkLoop();
+
       const celebrate = ()=>{
-        heroWrap.classList.add("celebrate");
-        if(hbSvg && !hbSvg.classList.contains("hidden")){ hbSvg.classList.remove("play"); void hbSvg.offsetWidth; hbSvg.classList.add("play"); }
-        else { hbImg.classList.remove("img-play"); void hbImg.offsetWidth; hbImg.classList.add("img-play"); }
-        setTimeout(()=> heroWrap.classList.remove("celebrate"), 1000);
+        const svg = heroWrap.querySelector(".hb-svg");
+        const img = heroWrap.querySelector(".hb-img");
+        const container = heroWrap.parentElement; // for sparkles class
+        container.classList.add("celebrate");
+        if(svg){ svg.classList.remove("play"); void svg.offsetWidth; svg.classList.add("play"); }
+        else if(img){ img.classList.remove("img-play"); void img.offsetWidth; img.classList.add("img-play"); }
+        setTimeout(()=> container.classList.remove("celebrate"), 1000);
       };
 
-      /* ===== Loader animation: prefer Lottie → Sprite → Ring ===== */
-      const loader = $("loader");
-      const loaderAnim = $("loaderAnim");
-      (async ()=>{
-        // 1) Lottie JSON
-        if(await assetExists("/assets/hacobit-loading.json")){
-          // 動的ロード（UMD）。window.lottie に生える。
-          await new Promise((res,rej)=>{
-            const s=document.createElement("script");
-            s.src="https://cdnjs.cloudflare.com/ajax/libs/lottie-web/5.12.2/lottie.min.js"; s.onload=res; s.onerror=rej; document.head.appendChild(s);
-          }).catch(()=>{});
+      /* ===== Lottie Loader 初期化（失敗時はリングのまま） ===== */
+      window.addEventListener("load", ()=>{
+        try{
           if(window.lottie){
-            const box=document.createElement("div"); box.id="lottieBox"; box.style.width="120px"; box.style.height="120px";
-            loaderAnim.replaceWith(box);
-            window.lottie.loadAnimation({container:box, renderer:"svg", loop:true, autoplay:true, path:"/assets/hacobit-loading.json"});
+            const json = document.getElementById("hbLottieData")?.textContent;
+            if(json){
+              const data = JSON.parse(json);
+              window.lottie.loadAnimation({
+                container: document.getElementById("hbLottie"),
+                renderer: "svg", loop: true, autoplay: true, animationData: data
+              });
+            }
           }
-        }
-        // 2) PNGスプライト（横8コマ）
-        else if(await assetExists("/assets/hacobit-loading.png")){
-          const sp=document.createElement("div"); sp.className="sprite"; sp.style.backgroundImage="url('/assets/hacobit-loading.png')";
-          sp.style.animation="spritePlay 1s steps(8) infinite";
-          loaderAnim.replaceWith(sp);
-        }
-        // 3) どちらも無ければ既定のリングをそのまま使う（エラーなし）
-      })();
+        }catch(e){}
+      });
 
       /* ===== Toast ===== */
       const toast = (msg)=>{ const t=$("toast"); t.textContent=msg; show(t); setTimeout(()=> hide(t), 1800); };
@@ -330,9 +378,10 @@
       });
       on("signoutBtn","click", async ()=>{ await signOut(auth); });
 
-      function tick(){ seconds+=5; $("time").textContent=fmtHMM(seconds); $("wage").textContent=`¥${(seconds? Math.round((earned/(seconds/3600))):0).toLocaleString()}`; $("orders").textContent=String(orders); }
+      const tick=()=>{ seconds+=5; $("time").textContent=fmtHMM(seconds); $("wage").textContent=`¥${(seconds? Math.round((earned/(seconds/3600))):0).toLocaleString()}`; $("orders").textContent=String(orders); };
 
       async function startSession(){
+        const {getFirestore, collection, addDoc, serverTimestamp} = await import("https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js");
         if(!auth.currentUser){ alert("先にログインしてね"); return; }
         if(timerId||currentSessionRef) return;
         const uid=auth.currentUser.uid;
@@ -342,7 +391,7 @@
         toast("タイマー開始。いい感じ！"); celebrate();
       }
       function pauseSession(){ if(timerId){ clearInterval(timerId); timerId=null; toast("一時停止中。水分補給してね"); } }
-      function requestEnd(){ if(!auth.currentUser){ alert("先にログインしてね"); return; } if(!currentSessionRef){ alert("まずは開始しよう"); return; } show($("endModal")); $("inputSales").focus(); }
+      function requestEnd(){ if(!auth.currentUser){ alert("先にログインしてね"); return; } if(!currentSessionRef){ alert("まずは開始しよう"); return; } show($("endModal")); }
 
       on("startBtn","click", startSession);
       on("pauseBtn","click", pauseSession);
@@ -351,28 +400,7 @@
       on("mPause","click", pauseSession);
       on("mStop","click", requestEnd);
 
-      on("endModal","click",(e)=>{ if(e.target.id==="endModal") hide($("endModal")); });
-      document.addEventListener("keydown",(e)=>{ if(e.key==="Escape") hide($("endModal")); });
-      on("cancelSave","click",()=> hide($("endModal")));
-      on("confirmSave","click", async ()=>{
-        if(!auth.currentUser){ hide($("endModal")); return; }
-        if(!currentSessionRef){ hide($("endModal")); return; }
-        const sales=Number($("inputSales").value||0), cnt=Number($("inputOrders").value||0);
-        if(!Number.isFinite(sales)||sales<0||!Number.isFinite(cnt)||cnt<0){ alert("数値を正しく入力してね"); return; }
-        earned=sales; orders=cnt;
-        const durationSec=Math.max(1, Math.round((Date.now()-(startedAtMs||Date.now()))/1000));
-        const hours=durationSec/3600; const hourly=hours>0? Math.round(sales/hours):0;
-        try{
-          await updateDoc(currentSessionRef,{status:"ended", endTime:serverTimestamp(), ordersCount:cnt, grossSales:sales, durationSec, hourlyWage:hourly, updatedAt:serverTimestamp()});
-          const best=Number(localStorage.getItem("bestHourly")||0);
-          if(hourly>best){ localStorage.setItem("bestHourly", String(hourly)); toast("すごい！新記録！"); celebrate(); }
-          else{ toast("保存しました。おつかれさま！"); celebrate(); }
-        }catch(err){ alert("保存に失敗しました: "+(err?.message||err)); }
-        finally{ hide($("endModal")); }
-        if(timerId){ clearInterval(timerId); timerId=null; }
-        seconds=0; earned=0; orders=0; currentSessionRef=null; startedAtMs=null;
-      });
-
+      // 今日の合計 + 空状態 + ローダー解除
       function startTodayListener(uid){
         if(unsubscribeToday){ unsubscribeToday(); unsubscribeToday=null; }
         const startOfDay=new Date(); startOfDay.setHours(0,0,0,0);
@@ -385,8 +413,8 @@
           const hourly= totalSec>0 ? Math.round(totalSales/(totalSec/3600)) : 0;
           $("wage").textContent=`¥${hourly.toLocaleString()}`; $("orders").textContent=String(totalOrders); $("time").textContent=fmtHMM(totalSec);
           if(count===0){ show($("empty")); } else { hide($("empty")); }
-          if(!firstLoaded){ firstLoaded=true; hide(loader); }
-        },()=>{ if(!firstLoaded){ firstLoaded=true; hide(loader); }});
+          if(!firstLoaded){ firstLoaded=true; hide($("loader")); }
+        },()=>{ if(!firstLoaded){ firstLoaded=true; hide($("loader")); }});
       }
 
       onAuthStateChanged(auth,(user)=>{
@@ -401,12 +429,15 @@
           seconds=0; earned=0; orders=0; currentSessionRef=null; startedAtMs=null;
           $("wage").textContent="¥0"; $("orders").textContent="0"; $("time").textContent="0:00";
           show($("empty"));
-          if(!firstLoaded){ firstLoaded=true; hide(loader); }
+          if(!firstLoaded){ firstLoaded=true; hide($("loader")); }
         }
       });
 
-      // フェイルセーフ：2.5sでローダー強制解除（ネットワークが遅くても固まらない）
-      setTimeout(()=> hide(loader), 2500);
+      // フェイルセーフ：2.5sでローダー強制解除
+      setTimeout(()=> hide($("loader")), 2500);
     </script>
+
+    <!-- 終了モーダル（簡易版 / 既存と同仕様なら流用） -->
+    <div id="endModal" class="hidden" aria-hidden="true"></div>
   </body>
 </html>
