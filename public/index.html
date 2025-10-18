@@ -3,185 +3,297 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>時給ハッカー | コックピット（保存＋今日の集計）</title>
+    <title>時給ハッカー | Atelier White & Mauve</title>
+    <meta name="color-scheme" content="light only" />
     <style>
-      /* ---- Warm Cozy Theme ----
-         Base:  #F7EFE7 （あたたかいアイボリー, 面積 61.8%）
-         Ink:   #2F2A26 （深いカカオ）
-         Accent:#E6A24B （やわらかゴールド）
-      --------------------------------------*/
+      /* ==========================================================
+         Palette : Atelier White & Mauve
+         ----------------------------------------------------------
+         Base (paper)      : #F6F4F2
+         Ink (text)        : #413D4B
+         Primary (action)  : #A18291
+         Accent (bronze)   : #B58A6C
+         Glass highlight   : rgba(255,255,255,.55)
+         ========================================================== */
       :root{
-        --base:#F7EFE7;
-        --ink:#2F2A26;
-        --muted:#7B726C;        /* 補助文字（温かめグレー） */
-        --panel:#FFFFFF;        /* カード面 */
-        --accent:#E6A24B;       /* 行動色（CTA） */
-        --accent-ink:#1E1A18;   /* アクセント上の文字 */
-        --accent-weak:#C88F46;  /* ホバー等の濃色 */
-        --radius:16px;
-        --shadow:0 10px 28px rgba(47,42,38,.10);
+        --base:#F6F4F2;
+        --ink:#413D4B;
+        --ink-weak:#6D6877;
+        --primary:#A18291;
+        --primary-strong:#8C6F7D;
+        --accent:#B58A6C;
+        --panel:#FFFFFF;
+        --glass:rgba(255,255,255,.55);
+        --radius-lg:22px;
+        --radius:14px;
+        --shadow-lg:0 24px 60px rgba(65,61,75,.12), 0 2px 10px rgba(65,61,75,.04);
+        --shadow-sm:0 8px 24px rgba(65,61,75,.10);
+        --grid:rgba(65,61,75,.08);
       }
-      html,body{height:100%}
+
+      /* base layout */
+      html,body{height:100%;}
       body{
-        margin:0; font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans JP", sans-serif;
-        color:var(--ink);
+        margin:0; color:var(--ink);
+        font-family: ui-rounded, system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans JP", "Hiragino Kaku Gothic ProN", Meiryo, sans-serif;
         background:
-          linear-gradient(135deg,
-            var(--base) 0,
-            var(--base) 61.8%,
-            rgba(230,162,75,0.12) 61.8%,
-            rgba(230,162,75,0.12) 100%);
+          radial-gradient(1200px 800px at 15% 10%, rgba(181,138,108,.10), transparent 60%),
+          radial-gradient(1400px 900px at 85% 20%, rgba(161,130,145,.12), transparent 60%),
+          linear-gradient(135deg, var(--base) 0 61.8%, rgba(161,130,145,.10) 61.8% 100%);
         display:grid; place-items:center;
       }
-      .card{
-        width:min(960px, 92vw);
-        background:var(--panel);
-        border:1px solid rgba(47,42,38,.10);
-        border-radius:var(--radius);
-        box-shadow:var(--shadow);
-        padding:28px;
-      }
-      .row{display:flex; gap:16px; align-items:center; flex-wrap:wrap}
-      .grow{flex:1}
-      h1{margin:0 0 4px 0; font-size:22px; letter-spacing:.2px}
-      .muted{color:var(--muted); font-size:13px}
 
-      button{
-        appearance:none; border:none; border-radius:12px; padding:12px 16px;
-        font-weight:700; cursor:pointer; transition:.2s transform ease, .2s filter;
-        background:var(--accent); color:var(--accent-ink);
-        box-shadow:0 2px 0 rgba(0,0,0,.06) inset;
-      }
-      button:hover{ filter:brightness(.97) }
-      button:disabled{ opacity:.6; cursor:not-allowed }
-      button.ghost{
-        background:transparent; color:var(--ink);
-        border:1px solid rgba(47,42,38,.25)
+      /* App shell (glass) */
+      .app{
+        width:min(1100px, 94vw);
+        border-radius:var(--radius-lg);
+        box-shadow:var(--shadow-lg);
+        background:linear-gradient(180deg, rgba(255,255,255,.75), rgba(255,255,255,.60));
+        backdrop-filter:saturate(1.2) blur(10px);
+        -webkit-backdrop-filter:saturate(1.2) blur(10px);
+        border:1px solid rgba(65,61,75,.08);
+        overflow:hidden;
       }
 
-      .grid{display:grid; grid-template-columns:repeat(3, 1fr); gap:12px; margin-top:16px}
-      .stat{
-        background:linear-gradient(180deg, #FFFFFF, #FAF6F1);
-        border:1px solid rgba(47,42,38,.12);
-        border-radius:12px; padding:14px
+      /* header */
+      .header{
+        display:flex; align-items:center; gap:14px; padding:18px 22px;
+        border-bottom:1px solid rgba(65,61,75,.06);
+        background:linear-gradient(180deg, rgba(255,255,255,.85), rgba(255,255,255,.65));
       }
-      .stat .label{color:var(--muted); font-size:12px}
-      .stat .val{font-size:20px; font-weight:800; margin-top:6px}
-
-      .map{
-        height:260px; border-radius:12px; margin-top:16px;
+      .logo{
+        width:40px;height:40px; border-radius:12px;
         background:
-          linear-gradient(0deg, rgba(47,42,38,.06), rgba(47,42,38,.03)),
-          repeating-linear-gradient(0deg, rgba(47,42,38,.10) 0 1px, transparent 1px 40px),
-          repeating-linear-gradient(90deg, rgba(47,42,38,.10) 0 1px, transparent 1px 40px);
-        display:grid; place-items:center; color:var(--muted);
+          radial-gradient(60% 60% at 30% 30%, rgba(255,255,255,.65), transparent 60%),
+          linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+        box-shadow:var(--shadow-sm);
+        position:relative; overflow:hidden;
       }
-      .footer{margin-top:18px; color:var(--muted); font-size:12px; text-align:center}
-      .rowbtn{display:flex; gap:10px; margin-top:14px; flex-wrap:wrap}
+      /* 手書き風 “ハック” ひと筆（ラインアート） */
+      .logo:after{
+        content:""; position:absolute; inset:0;
+        background:
+          radial-gradient(4px 4px at 30% 60%, #fff 0 40%, transparent 41%),
+          radial-gradient(4px 4px at 55% 40%, #fff 0 40%, transparent 41%),
+          linear-gradient(45deg, rgba(255,255,255,.6) 0 6px, transparent 7px);
+        mix-blend-mode:soft-light; opacity:.6;
+      }
+      .ttl{font-weight:900; letter-spacing:.3px}
+      .sub{color:var(--ink-weak); font-size:13px}
+      .spacer{flex:1}
+      .ghost{
+        background:transparent; color:var(--ink);
+        border:1px solid rgba(65,61,75,.20); border-radius:999px; padding:10px 14px;
+        font-weight:700; cursor:pointer;
+      }
+
+      /* CTA button (micro-interaction) */
+      .btn{
+        appearance:none; border:none; border-radius:999px;
+        background:linear-gradient(180deg, var(--primary) 0%, var(--primary-strong) 100%);
+        color:#FFF; padding:12px 18px; font-weight:800; letter-spacing:.2px;
+        box-shadow:0 6px 14px rgba(161,130,145,.35), inset 0 2px 0 rgba(255,255,255,.25);
+        transform:translateY(0); transition:.15s transform ease, .2s filter ease;
+        cursor:pointer;
+      }
+      .btn:hover{ filter:brightness(1.03); }
+      .btn:active{ transform:translateY(2px); }
+
+      /* hero notice */
+      .hero{
+        display:flex; gap:16px; align-items:flex-start; padding:18px 22px 2px;
+      }
+      .hero-bubble{
+        flex:1;
+        background:linear-gradient(180deg, rgba(255,255,255,.85), rgba(255,255,255,.62));
+        backdrop-filter:blur(8px);
+        border:1px solid rgba(65,61,75,.08); border-radius:18px; padding:16px;
+        box-shadow:var(--shadow-sm);
+      }
+      .hero-bubble h1{margin:0 0 6px 0; font-size:20px}
+      .micro{color:var(--ink-weak); font-size:13px}
+
+      /* profile row */
+      .profile{
+        display:flex; align-items:center; gap:12px; padding:0 22px 12px;
+      }
+      .avatar{width:44px;height:44px;border-radius:50%;border:1px solid rgba(65,61,75,.15)}
       .tag{
-        background:rgba(230,162,75,.16); color:#6B4B1D;
-        border:1px solid rgba(230,162,75,.55);
-        padding:6px 10px; border-radius:999px; font-size:12px
+        display:inline-flex; align-items:center; gap:8px;
+        border:1px solid rgba(181,138,108,.45);
+        background:rgba(181,138,108,.12);
+        color:var(--accent);
+        border-radius:999px; padding:6px 10px; font-weight:700; font-size:12px;
       }
-      a{color:#6B4B1D; text-decoration:none}
-      a:hover{text-decoration:underline}
 
-      /* ---- モーダル ---- */
-      .modal-bg{
-        position:fixed; inset:0; background:rgba(0,0,0,.2);
-        display:grid; place-items:center; z-index:1000;
+      /* dashboard cards */
+      .grid{display:grid; grid-template-columns:repeat(3,1fr); gap:14px; padding:0 22px;}
+      .card{
+        background:
+          linear-gradient(180deg, rgba(255,255,255,.92), rgba(255,255,255,.70)),
+          radial-gradient(100% 140% at 100% 0, rgba(181,138,108,.10), transparent 35%),
+          radial-gradient(100% 140% at 0 100%, rgba(161,130,145,.08), transparent 35%);
+        border:1px solid rgba(65,61,75,.08); border-radius:16px; padding:14px;
+        box-shadow:var(--shadow-sm);
       }
-      .modal-bg.hidden{ display:none !important; } /* ← 隠すを必ず勝たせる */
-      .modal{
-        background:#fff; color:var(--ink); border-radius:14px;
-        width:min(420px, 92vw); padding:18px; box-shadow:var(--shadow)
-      }
-      .modal h3{margin:0 0 10px 0; font-size:18px}
-      .field{margin:10px 0}
-      .field label{font-size:12px; color:var(--muted)}
-      .field input{width:100%; padding:10px 12px; border:1px solid rgba(47,42,38,.2); border-radius:10px; font-size:14px}
-      .right{display:flex; gap:10px; justify-content:flex-end; margin-top:12px}
+      .label{font-size:12px; color:var(--ink-weak)}
+      .value{font-size:22px; font-weight:900; letter-spacing:.2px; margin-top:6px}
 
-      /* ---- トースト ---- */
+      .actions{display:flex; gap:10px; padding:10px 22px 16px}
+      .chip{
+        border:1px solid rgba(65,61,75,.18); background:rgba(255,255,255,.6);
+        padding:10px 14px; border-radius:12px; font-weight:800; color:var(--ink);
+        cursor:pointer; transition:.15s transform ease;
+      }
+      .chip:active{ transform:translateY(2px); }
+      .chip.primary{
+        border-color:transparent;
+        background:
+          linear-gradient(180deg, var(--primary) 0%, var(--primary-strong) 100%);
+        color:#fff;
+        box-shadow:0 6px 14px rgba(161,130,145,.35), inset 0 2px 0 rgba(255,255,255,.20);
+      }
+
+      /* map placeholder (glass board with grid) */
+      .board{
+        margin:4px 22px 22px; height:280px; border-radius:18px;
+        background:
+          linear-gradient(180deg, rgba(255,255,255,.9), rgba(255,255,255,.7)),
+          repeating-linear-gradient(0deg, var(--grid) 0 1px, transparent 1px 48px),
+          repeating-linear-gradient(90deg, var(--grid) 0 1px, transparent 1px 48px);
+        border:1px solid rgba(65,61,75,.08);
+        box-shadow:var(--shadow-sm); display:grid; place-items:center; color:var(--ink-weak);
+      }
+
+      /* toast */
       .toast{
         position:fixed; left:50%; bottom:26px; transform:translateX(-50%);
-        background:#fff; border:1px solid rgba(47,42,38,.12);
-        padding:10px 14px; border-radius:999px; box-shadow:var(--shadow);
-        color:var(--ink); font-weight:700; z-index:1100
+        background:linear-gradient(180deg, #fff, rgba(255,255,255,.92));
+        border:1px solid rgba(65,61,75,.10); color:var(--ink); font-weight:800;
+        padding:10px 14px; border-radius:999px; box-shadow:var(--shadow-sm); z-index:1200;
       }
-      .hidden{display:none}
+      .hidden{display:none !important;}
+
+      /* modal */
+      .modal-bg{
+        position:fixed; inset:0; z-index:1100; display:grid; place-items:center;
+        background:rgba(65,61,75,.18);
+      }
+      .modal{
+        width:min(440px, 92vw); background:linear-gradient(180deg, #fff, rgba(255,255,255,.94));
+        border:1px solid rgba(65,61,75,.12); border-radius:18px; padding:18px; box-shadow:var(--shadow-lg);
+      }
+      .modal h3{margin:0 0 10px 0}
+      .field{margin:10px 0}
+      .field label{font-size:12px; color:var(--ink-weak)}
+      .field input{
+        width:100%; padding:12px 14px; border-radius:12px;
+        border:1px solid rgba(65,61,75,.18); background:rgba(255,255,255,.8); color:var(--ink);
+      }
+      .right{display:flex; gap:10px; justify-content:flex-end; margin-top:12px}
+      .link{color:var(--primary); text-decoration:none}
+      .link:hover{text-decoration:underline}
+
+      /* gentle animations (respect reduced motion) */
+      @media (prefers-reduced-motion: no-preference){
+        .card, .hero-bubble, .board { animation: floatUp .28s ease both; }
+        @keyframes floatUp { from{opacity:0; transform:translateY(4px)} to{opacity:1; transform:translateY(0)} }
+      }
+
+      /* responsive */
+      @media (max-width:720px){
+        .grid{grid-template-columns:1fr; gap:10px}
+        .actions{flex-wrap:wrap}
+        .hero{flex-direction:column}
+      }
     </style>
   </head>
   <body>
-    <div class="card">
-      <div class="row">
-        <div class="grow">
-          <h1>時給ハッカー — コックピット</h1>
-          <div class="muted">Googleでログイン→開始/終了で「本物の保存」。保存後は“今日の合計”に反映します。</div>
-        </div>
+    <div class="app" role="application" aria-label="時給ハッカー コックピット">
+      <!-- header -->
+      <div class="header">
+        <div class="logo" aria-hidden="true"></div>
         <div>
-          <button id="signinBtn">Googleでログイン</button>
-          <button id="signoutBtn" class="ghost hidden">ログアウト</button>
+          <div class="ttl">時給ハッカー</div>
+          <div class="sub">創造的で、上質な「頼れるパートナー」</div>
         </div>
+        <div class="spacer"></div>
+        <button id="signinBtn" class="btn">Googleでログイン</button>
+        <button id="signoutBtn" class="ghost hidden">ログアウト</button>
       </div>
 
-      <div id="authed" class="hidden">
-        <div class="row" style="margin-top:14px">
-          <img id="avatar" src="" alt="" style="width:40px;height:40px;border-radius:50%;border:1px solid rgba(47,42,38,.25)">
-          <div class="grow">
-            <div id="username" style="font-weight:800"></div>
-            <div class="muted" id="email"></div>
-          </div>
-          <span class="tag">保存先：users/{uid}/work_sessions（今日の集計を表示）</span>
+      <!-- hero -->
+      <div class="hero">
+        <div class="hero-bubble">
+          <h1>こんにちは、今日も軽やかにいこう。</h1>
+          <div class="micro">「開始」でタイマーをスタート。「終了」で売上と件数をそっと記録するよ。保存したら今日の合計に反映して、がんばりをちゃんと見える化。</div>
         </div>
-
-        <div class="grid">
-          <div class="stat"><div class="label">推定時給（今日）</div><div class="val" id="wage">¥0</div></div>
-          <div class="stat"><div class="label">今日の件数</div><div class="val" id="orders">0</div></div>
-          <div class="stat"><div class="label">稼働時間（今日）</div><div class="val" id="time">0:00</div></div>
-        </div>
-
-        <div class="rowbtn">
-          <button id="startBtn">開始</button>
-          <button id="pauseBtn" class="ghost">一時停止</button>
-          <button id="stopBtn" class="ghost">終了</button>
-        </div>
-
-        <div class="map">（ここにGoogleマップを統合予定／現在はダミー表示）</div>
+        <!-- 小さな手書き風イラスト（SVGライン） -->
+        <svg width="88" height="60" viewBox="0 0 88 60" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <path d="M6 36 C 18 46, 42 46, 58 34" stroke="#A18291" stroke-width="4" stroke-linecap="round" fill="none"/>
+          <path d="M30 12 L50 28" stroke="#B58A6C" stroke-width="4" stroke-linecap="round"/>
+          <circle cx="64" cy="20" r="6" stroke="#413D4B" stroke-width="3" fill="none"/>
+        </svg>
       </div>
 
-      <div id="unauthed" style="margin-top:18px" class="muted">
-        ログインすると、ここにコックピットが表示されます。
+      <!-- profile -->
+      <div id="authed" class="profile hidden">
+        <img id="avatar" class="avatar" alt="ユーザーのアバター" src="">
+        <div class="grow">
+          <div id="username" style="font-weight:900"></div>
+          <div id="email" class="sub"></div>
+        </div>
+        <span class="tag" title="保存コレクション">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 12h14M12 5v14" stroke="#B58A6C" stroke-width="2" stroke-linecap="round"/></svg>
+          users/{uid}/work_sessions
+        </span>
       </div>
 
-      <div class="footer">© Jikyuu Hacker</div>
+      <!-- dashboard -->
+      <div class="grid" aria-live="polite">
+        <div class="card"><div class="label">推定時給（今日）</div><div id="wage" class="value">¥0</div></div>
+        <div class="card"><div class="label">今日の件数</div><div id="orders" class="value">0</div></div>
+        <div class="card"><div class="label">稼働時間（今日）</div><div id="time" class="value">0:00</div></div>
+      </div>
+
+      <!-- actions -->
+      <div class="actions">
+        <button id="startBtn" class="chip primary">開始する</button>
+        <button id="pauseBtn" class="chip">一時停止</button>
+        <button id="stopBtn" class="chip">終了して記録</button>
+        <div class="spacer"></div>
+        <a class="link" href="#" aria-disabled="true" onclick="return false;">クエストは準備中</a>
+      </div>
+
+      <!-- map board placeholder -->
+      <div class="board">（ここにGoogleマップ / アクティビティを重ねて表示予定）</div>
     </div>
 
-    <!-- 保存用モーダル（終了時） -->
+    <!-- 保存モーダル -->
     <div id="endModal" class="modal-bg hidden" aria-hidden="true">
       <div class="modal" role="dialog" aria-modal="true" aria-labelledby="saveTitle">
-        <h3 id="saveTitle">セッションを保存</h3>
+        <h3 id="saveTitle">セッションを保存するね</h3>
         <div class="field">
-          <label>売上（円）</label>
+          <label for="inputSales">売上（円）</label>
           <input id="inputSales" type="number" min="0" step="100" placeholder="例: 3500" />
         </div>
         <div class="field">
-          <label>件数</label>
+          <label for="inputOrders">件数</label>
           <input id="inputOrders" type="number" min="0" step="1" placeholder="例: 5" />
         </div>
         <div class="right">
-          <button id="cancelSave" class="ghost" type="button">キャンセル</button>
-          <button id="confirmSave" type="button">保存</button>
+          <button id="cancelSave" class="ghost" type="button">やっぱやめる</button>
+          <button id="confirmSave" class="btn" type="button">記録しておくね</button>
         </div>
       </div>
     </div>
 
-    <!-- 保存トースト -->
-    <div id="toast" class="toast hidden">保存しました ✅</div>
+    <!-- 祝トースト -->
+    <div id="toast" class="toast hidden">保存しました。今日もいい流れ！</div>
 
     <!-- Firebase (Modules via CDN) -->
     <script type="module">
-      // --- Firebase 設定（あなたの値をそのまま使用） ---
+      // ==== Firebase Config（あなたの値） ====
       const firebaseConfig = {
         apiKey: "AIzaSyA8x75S7gx0vF4CtENATZO0Spnn33t_Oyg",
         authDomain: "jikyuu-hacker.firebaseapp.com",
@@ -192,7 +304,7 @@
         measurementId: "G-B85Q3TRR6V"
       };
 
-      /* v11.0.1 で統一 */
+      // ==== SDK v11（modular, CDN） ====
       import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
       import {
         initializeAuth,
@@ -211,206 +323,169 @@
       } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
       import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-analytics.js";
 
-      // --- 初期化 ---
+      // ==== App init ====
       const app = initializeApp(firebaseConfig);
-      try { getAnalytics(app); } catch (_) {}
+      try{ getAnalytics(app); }catch(_){}
 
-      // Auth（明示初期化）
+      // Auth（安定化：明示初期化＋Resolver＋永続化）
       const auth = initializeAuth(app, {
-        persistence: [indexedDBLocalPersistence, browserLocalPersistence],
+        persistence:[indexedDBLocalPersistence, browserLocalPersistence],
         popupRedirectResolver: browserPopupRedirectResolver
       });
       auth.languageCode = "ja";
       const provider = new GoogleAuthProvider();
 
-      // Firestore
+      // DB
       const db = getFirestore(app);
 
-      // DOM util
-      const $   = (id)=>document.getElementById(id);
-      const show= (el)=>{ el.classList.remove("hidden"); el.setAttribute("aria-hidden","false"); };
-      const hide= (el)=>{ el.classList.add("hidden");    el.setAttribute("aria-hidden","true");  };
-
-      // 初期状態でモーダルは必ず閉じる
-      hide($("endModal"));
-
-      // ユーティリティ
+      // DOM utils
+      const $ = (id)=>document.getElementById(id);
+      const show = (el)=>{ el.classList.remove("hidden"); el.setAttribute("aria-hidden","false"); };
+      const hide = (el)=>{ el.classList.add("hidden"); el.setAttribute("aria-hidden","true"); };
       const pad2 = (n)=>String(n).padStart(2,"0");
-      const fmtHMM = (sec)=>{
-        const h = Math.floor(sec/3600);
-        const m = Math.floor((sec%3600)/60);
-        return `${h>0? h+":" : ""}${h>0? pad2(m): m.toString().padStart(1,"0")}:${pad2(Math.floor(sec%60))}`.replace(/^0:/,"0:");
+      const fmtHMM = (sec)=>{ const h=Math.floor(sec/3600), m=Math.floor((sec%3600)/60); return `${h}:${pad2(m)}`; };
+
+      // UI state
+      let signingIn=false;
+      let timerId=null, seconds=0, earned=0, orders=0;
+      let currentSessionRef=null, startedAtMs=null;
+      let unsubscribeToday=null;
+
+      // micro feedback
+      const toast = (msg)=>{
+        const t=$("toast"); t.textContent=msg; t.classList.remove("hidden");
+        setTimeout(()=>t.classList.add("hidden"),1800);
       };
 
-      // UI状態
-      let signingIn = false;
-      let timerId = null, seconds = 0, earned = 0, orders = 0;
-      let currentSessionRef = null;  // Firestore Doc参照
-      let startedAtMs = null;        // クライアント計測用
-      let unsubscribeToday = null;   // 今日の集計リスナー
-
-      // クリック連打ガード＋Redirectフォールバック
+      // Sign in/out
       $("signinBtn").addEventListener("click", async ()=>{
-        if (signingIn) return;
-        signingIn = true; $("signinBtn").disabled = true; $("signinBtn").style.opacity = ".7";
-        try {
-          await signInWithPopup(auth, provider);
-        } catch(e) {
-          const msg = String(e?.message || "");
-          if (e?.code === "auth/popup-blocked" || msg.includes("Pending promise")){
+        if(signingIn) return; signingIn=true;
+        $("signinBtn").disabled=true;
+        try{ await signInWithPopup(auth, provider); }
+        catch(e){
+          const msg=String(e?.message||"");
+          if(e?.code==="auth/popup-blocked"||msg.includes("Pending promise")){
             await signInWithRedirect(auth, provider);
-          } else {
-            alert("ログインに失敗しました: " + (e?.message || e));
-          }
-        } finally {
-          signingIn = false; $("signinBtn").disabled = false; $("signinBtn").style.opacity = "";
+          }else{ alert("ログインに失敗しました: "+(e?.message||e)); }
+        }finally{
+          signingIn=false; $("signinBtn").disabled=false;
         }
       });
       $("signoutBtn").addEventListener("click", async ()=>{ await signOut(auth); });
 
-      // タイマー（見た目の推定）
+      // Timer visuals
       function tick(){
-        seconds += 5; // デモ用 5秒刻み
+        seconds+=5;
         $("time").textContent = fmtHMM(seconds);
-        $("wage").textContent = `¥${(seconds? Math.round((earned/(seconds/3600))) : 0).toLocaleString()}`;
+        $("wage").textContent = `¥${(seconds? Math.round((earned/(seconds/3600))):0).toLocaleString()}`;
         $("orders").textContent = String(orders);
       }
 
       $("startBtn").addEventListener("click", async ()=>{
-        if (!auth.currentUser) { alert("先にログインしてください"); return; }
-        if (timerId || currentSessionRef) return;
-
-        // Firestore にセッション作成
-        const uid = auth.currentUser.uid;
-        const col = collection(db, "users", uid, "work_sessions");
-        currentSessionRef = await addDoc(col, {
-          status: "running",
-          startTime: serverTimestamp(),
-          endTime: null,
-          ordersCount: 0,
-          grossSales: 0,
-          areaGeohash: null,
-          areaLabel: null,
-          createdAt: serverTimestamp(),
-          updatedAt: serverTimestamp()
+        if(!auth.currentUser){ alert("先にログインしてね"); return; }
+        if(timerId||currentSessionRef) return;
+        const uid=auth.currentUser.uid;
+        const col=collection(db,"users",uid,"work_sessions");
+        currentSessionRef=await addDoc(col,{
+          status:"running",
+          startTime:serverTimestamp(),
+          endTime:null,
+          ordersCount:0,
+          grossSales:0,
+          areaGeohash:null,
+          areaLabel:null,
+          createdAt:serverTimestamp(),
+          updatedAt:serverTimestamp()
         });
-        startedAtMs = Date.now();
-
-        // UI開始
-        timerId = setInterval(tick, 5000);
+        startedAtMs=Date.now();
+        timerId=setInterval(tick,5000);
+        toast("タイマー開始。いい感じ！");
       });
 
       $("pauseBtn").addEventListener("click", ()=>{
-        if (timerId){ clearInterval(timerId); timerId=null; }
+        if(timerId){ clearInterval(timerId); timerId=null; toast("一時停止中。水分補給してね"); }
       });
 
-      // 終了→入力モーダル表示
       $("stopBtn").addEventListener("click", ()=>{
-        if (!auth.currentUser) { alert("先にログインしてください"); return; }
-        if (!currentSessionRef){ alert("まだ開始していません"); return; }
-        show($("endModal"));
-        $("inputSales").focus();
+        if(!auth.currentUser){ alert("先にログインしてね"); return; }
+        if(!currentSessionRef){ alert("まずは開始しよう"); return; }
+        show($("endModal")); $("inputSales").focus();
       });
 
-      // モーダル制御：外側クリック・Esc・キャンセルで閉じる
-      $("endModal").addEventListener("click", (e)=>{
-        if (e.target.id === "endModal") hide($("endModal"));
-      });
-      document.addEventListener("keydown", (e)=>{
-        if (e.key === "Escape") hide($("endModal"));
-      });
-      $("cancelSave").addEventListener("click", ()=> hide($("endModal")));
+      // modal controls
+      $("endModal").addEventListener("click",(e)=>{ if(e.target.id==="endModal") hide($("endModal")); });
+      document.addEventListener("keydown",(e)=>{ if(e.key==="Escape") hide($("endModal")); });
+      $("cancelSave").addEventListener("click",()=> hide($("endModal")));
 
       $("confirmSave").addEventListener("click", async ()=>{
-        if (!auth.currentUser){ alert("ログインが必要です"); hide($("endModal")); return; }
-        if (!currentSessionRef){ alert("セッションが見つかりません。もう一度開始してください"); hide($("endModal")); return; }
+        if(!auth.currentUser){ hide($("endModal")); return; }
+        if(!currentSessionRef){ hide($("endModal")); return; }
 
-        const sales = Number($("inputSales").value || 0);
-        const cnt   = Number($("inputOrders").value || 0);
-        if (!Number.isFinite(sales) || sales < 0 || !Number.isFinite(cnt) || cnt < 0){
-          alert("数値を正しく入力してください"); return;
-        }
+        const sales=Number($("inputSales").value||0);
+        const cnt=Number($("inputOrders").value||0);
+        if(!Number.isFinite(sales)||sales<0||!Number.isFinite(cnt)||cnt<0){ alert("数値を正しく入力してね"); return; }
 
-        earned = sales; orders = cnt;
-
-        // Firestore 更新
-        const durationSec = Math.max(1, Math.round((Date.now() - (startedAtMs||Date.now()))/1000));
-        const hours = durationSec / 3600;
-        const hourly = hours > 0 ? Math.round(sales / hours) : 0;
+        earned=sales; orders=cnt;
+        const durationSec=Math.max(1, Math.round((Date.now()-(startedAtMs||Date.now()))/1000));
+        const hours=durationSec/3600;
+        const hourly=hours>0? Math.round(sales/hours):0;
 
         try{
-          await updateDoc(currentSessionRef, {
-            status: "ended",
-            endTime: serverTimestamp(),
-            ordersCount: cnt,
-            grossSales: sales,
-            durationSec,
-            hourlyWage: hourly,
-            updatedAt: serverTimestamp()
+          await updateDoc(currentSessionRef,{
+            status:"ended", endTime:serverTimestamp(),
+            ordersCount:cnt, grossSales:sales,
+            durationSec, hourlyWage:hourly,
+            updatedAt:serverTimestamp()
           });
+          toast(hourly>Number(localStorage.getItem("bestHourly")||0) ? "すごい！新記録！" : "保存しました。おつかれさま！");
+          if(hourly>Number(localStorage.getItem("bestHourly")||0)) localStorage.setItem("bestHourly", String(hourly));
         }catch(err){
-          alert("保存に失敗しました: " + (err?.message || err));
-          return;
+          alert("保存に失敗しました: "+(err?.message||err));
         }finally{
           hide($("endModal"));
-          // トースト表示
-          const t = $("toast"); t.classList.remove("hidden");
-          setTimeout(()=> t.classList.add("hidden"), 1800);
         }
 
-        // 片付け（見た目のカウンタは“今日の集計”に任せる）
-        if (timerId){ clearInterval(timerId); timerId=null; }
-        seconds = 0; earned = 0; orders = 0;
-        currentSessionRef = null; startedAtMs = null;
+        if(timerId){ clearInterval(timerId); timerId=null; }
+        seconds=0; earned=0; orders=0; currentSessionRef=null; startedAtMs=null;
       });
 
-      // ---- 今日の集計（リアルタイム） ----
+      // Live "today" totals (軽量化のため status=ended で50件購読→クライアントで当日抽出)
       function startTodayListener(uid){
-        // すでに購読中なら解除
-        if (unsubscribeToday){ unsubscribeToday(); unsubscribeToday = null; }
-
-        const startOfDay = new Date();
-        startOfDay.setHours(0,0,0,0);
-        const startTs = Timestamp.fromDate(startOfDay);
-
-        // 端末差やインデックス不要のため、まずは「status=ended の最近50件」を購読 → クライアントで“今日”にフィルタ
-        const col = collection(db, "users", uid, "work_sessions");
-        const q = query(col, where("status","==","ended"), orderBy("startTime","desc"), limit(50));
-
-        unsubscribeToday = onSnapshot(q, (snap)=>{
-          let totalSales = 0, totalOrders = 0, totalSec = 0;
-          snap.forEach(doc=>{
-            const d = doc.data();
-            if (!d.startTime) return;
-            if (d.startTime.toMillis() < startTs.toMillis()) return; // 今日以前は除外
-            totalSales  += Number(d.grossSales || 0);
-            totalOrders += Number(d.ordersCount || 0);
-            totalSec    += Number(d.durationSec || 0);
+        if(unsubscribeToday){ unsubscribeToday(); unsubscribeToday=null; }
+        const startOfDay=new Date(); startOfDay.setHours(0,0,0,0);
+        const startTs=Timestamp.fromDate(startOfDay);
+        const col=collection(db,"users",uid,"work_sessions");
+        const q=query(col, where("status","==","ended"), orderBy("startTime","desc"), limit(50));
+        unsubscribeToday = onSnapshot(q,(snap)=>{
+          let totalSales=0,totalOrders=0,totalSec=0;
+          snap.forEach(d=>{
+            const v=d.data(); if(!v.startTime) return;
+            if(v.startTime.toMillis()<startTs.toMillis()) return;
+            totalSales+=Number(v.grossSales||0);
+            totalOrders+=Number(v.ordersCount||0);
+            totalSec+=Number(v.durationSec||0);
           });
-          const hourly = totalSec>0 ? Math.round(totalSales / (totalSec/3600)) : 0;
-          $("wage").textContent   = `¥${hourly.toLocaleString()}`;
-          $("orders").textContent = String(totalOrders);
-          const h = Math.floor(totalSec/3600), m = Math.floor((totalSec%3600)/60);
-          $("time").textContent   = `${h}:${String(m).padStart(2,"0")}`;
-        }, (err)=>{
-          console.error("today onSnapshot error:", err);
-        });
+          const hourly= totalSec>0 ? Math.round(totalSales/(totalSec/3600)) : 0;
+          $("wage").textContent=`¥${hourly.toLocaleString()}`;
+          $("orders").textContent=String(totalOrders);
+          $("time").textContent=fmtHMM(totalSec);
+        },(err)=>console.error("today-snapshot",err));
       }
 
-      onAuthStateChanged(auth, (user)=>{
-        if (user){
-          $("username").textContent = user.displayName || "配達員さん";
-          $("email").textContent    = user.email || "";
-          $("avatar").src           = user.photoURL || "";
-          show($("authed")); show($("signoutBtn")); hide($("signinBtn")); hide($("unauthed"));
+      onAuthStateChanged(auth,(user)=>{
+        if(user){
+          $("username").textContent=user.displayName || "配達員さん";
+          $("email").textContent=user.email || "";
+          $("avatar").src=user.photoURL || "";
+          show($("authed")); show($("signoutBtn")); hide($("signinBtn"));
           startTodayListener(user.uid);
-        } else {
-          hide($("endModal")); // ログアウト時はモーダルも必ず閉じる
-          hide($("authed")); hide($("signoutBtn")); show($("signinBtn")); show($("unauthed"));
-          if (unsubscribeToday){ unsubscribeToday(); unsubscribeToday = null; }
-          if (timerId){ clearInterval(timerId); timerId=null; }
-          seconds=0; earned=0; orders=0; startedAtMs=null; currentSessionRef=null;
-          $("time").textContent="0:00"; $("wage").textContent="¥0"; $("orders").textContent="0";
+        }else{
+          hide($("endModal"));
+          hide($("authed")); hide($("signoutBtn")); show($("signinBtn"));
+          if(unsubscribeToday){ unsubscribeToday(); unsubscribeToday=null; }
+          if(timerId){ clearInterval(timerId); timerId=null; }
+          seconds=0; earned=0; orders=0; currentSessionRef=null; startedAtMs=null;
+          $("wage").textContent="¥0"; $("orders").textContent="0"; $("time").textContent="0:00";
         }
       });
     </script>
