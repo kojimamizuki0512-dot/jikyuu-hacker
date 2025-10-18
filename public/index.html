@@ -6,7 +6,6 @@
     <title>時給ハッカー | Atelier White & Mauve + HACOBIT Hero</title>
     <meta name="color-scheme" content="light only" />
     <style>
-      /* ===== Brand palette (Atelier White & Mauve) ===== */
       :root{
         --base:#F6F4F2; --ink:#413D4B; --ink-weak:#6D6877;
         --primary:#A18291; --primary-strong:#8C6F7D; --accent:#B58A6C;
@@ -35,7 +34,6 @@
         border:1px solid rgba(65,61,75,.08); overflow:hidden;
       }
 
-      /* ===== Header ===== */
       .header{
         display:flex; align-items:center; gap:14px; padding:18px 22px;
         border-bottom:1px solid rgba(65,61,75,.06);
@@ -53,7 +51,7 @@
         transform:translateY(0);transition:.15s transform ease,.2s filter ease;cursor:pointer;touch-action:manipulation}
       .btn:hover{filter:brightness(1.03)} .btn:active{transform:translateY(2px)}
 
-      /* ===== Hero: big HACOBIT always visible ===== */
+      /* ===== Hero (大きなHACOBIT常駐) ===== */
       .hero{display:grid; grid-template-columns:1.2fr .8fr; gap:16px; align-items:center; padding:18px 22px 10px}
       .hero-left{
         background:linear-gradient(180deg, rgba(255,255,255,.85), rgba(255,255,255,.62));
@@ -62,28 +60,26 @@
       .hero-left h1{margin:0 0 6px 0; font-size:20px}
       .micro{color:var(--ink-weak); font-size:13px}
       .hero-right{position:relative; display:grid; place-items:center}
-      .hero-wrap{width:min(320px, 72vw); aspect-ratio:1; position:relative}
+      .hero-wrap{width:min(360px, 80vw); aspect-ratio:1; position:relative}
+      .hb-img{width:100%; height:100%; object-fit:contain; filter:drop-shadow(0 1.5px 4px rgba(0,0,0,.12))}
+      /* 画像版にも軽い息づかい＆祝アニメを適用 */
+      @keyframes img_idle_bob{ 0%,100%{transform:translateY(0)} 50%{transform:translateY(-2px)} }
+      .img-idle{ animation: img_idle_bob 3s ease-in-out infinite; }
+      @keyframes img_celebrate{ 0%{transform:translateY(-4px) scale(1)} 60%{transform:translateY(-2px) scale(1.02)} 100%{transform:translateY(0) scale(1)} }
+      .img-play{ animation: img_celebrate 1s ease both; }
+
       /* ブロンズきらめき（クエスト/新記録時） */
       .sparkles{pointer-events:none; position:absolute; inset:0}
-      .sparkles span{
-        position:absolute; width:8px;height:8px; background:var(--accent); border-radius:2px; opacity:0;
-      }
-      @keyframes sparkle{
-        0%{transform:translate(0,0) scale(1) rotate(0deg); opacity:.9}
-        100%{transform:translate(var(--dx),var(--dy)) scale(0.8) rotate(180deg); opacity:0}
-      }
+      .sparkles span{ position:absolute; width:8px;height:8px; background:var(--accent); border-radius:2px; opacity:0; }
+      @keyframes sparkle{ 0%{transform:translate(0,0) scale(1) rotate(0deg); opacity:.9} 100%{transform:translate(var(--dx),var(--dy)) scale(0.8) rotate(180deg); opacity:0} }
       .celebrate .sparkles span{ animation: sparkle .9s ease-out forwards }
 
-      /* HACOBIT SVG（線= #413D4B 2.5px, base主体, 小面積アクセント, 影12%） */
+      /* インラインSVG（フォールバック） */
       .hb-svg{width:100%; height:100%}
-      /* idle: gentle breathing（常時） */
       @keyframes hb_idle_bob{ 0%,100%{transform:translateY(0)} 50%{transform:translateY(-2px)} }
       #hbHero.idle #hb_body{ animation: hb_idle_bob 3s ease-in-out infinite; }
-      /* random blink（JSでトグル） */
       @keyframes hb_blink{ from{transform:scaleY(1)} to{transform:scaleY(.7)} }
       #hbHero.blink #hb_eyes{ animation: hb_blink .12s linear both; }
-
-      /* success pose（1.0s） */
       #hbHero.play #hb_body{animation:hb_body_up .12s ease-out both, hb_body_relax .24s .60s ease-in-out both, hb_body_return .16s .84s linear both}
       @keyframes hb_body_up{from{transform:translateY(0)} to{transform:translateY(-4px)}}
       @keyframes hb_body_relax{from{transform:translateY(-4px)} to{transform:translateY(-2px)}}
@@ -93,7 +89,7 @@
       #hbHero.play #hb_scarf{transform-origin: 256px 300px; animation:hb_scarf_follow .16s .20s cubic-bezier(.34,1.56,.64,1) both}
       @keyframes hb_scarf_follow{0%{transform:rotate(0deg)}70%{transform:rotate(6deg)}100%{transform:rotate(-3deg)}}
 
-      /* ===== Profile / Dashboard ===== */
+      /* ===== Dashboard他 ===== */
       .profile{display:flex; align-items:center; gap:12px; padding:0 22px 12px}
       .avatar{width:44px;height:44px;border-radius:50%;border:1px solid rgba(65,61,75,.15)}
       .tag{display:inline-flex;align-items:center;gap:8px;border:1px solid rgba(181,138,108,.45);background:rgba(181,138,108,.12);color:var(--accent);border-radius:999px;padding:6px 10px;font-weight:700;font-size:12px}
@@ -103,14 +99,12 @@
         radial-gradient(100% 140% at 100% 0, rgba(181,138,108,.10), transparent 35%),
         radial-gradient(100% 140% at 0 100%, rgba(161,130,145,.08), transparent 35%);
         border:1px solid rgba(65,61,75,.08); border-radius:16px; padding:14px; box-shadow:var(--shadow-sm)}
-      .label{font-size:12px; color:var(--ink-weak)}
-      .value{font-size:22px; font-weight:900; letter-spacing:.2px; margin-top:6px}
+      .label{font-size:12px; color:var(--ink-weak)} .value{font-size:22px; font-weight:900; letter-spacing:.2px; margin-top:6px}
       .actions{display:flex; gap:10px; padding:10px 22px 16px}
       .chip{border:1px solid rgba(65,61,75,.18); background:rgba(255,255,255,.6); padding:12px 16px; border-radius:14px; font-weight:800; color:var(--ink); cursor:pointer; transition:.15s transform ease; touch-action:manipulation; min-width:48px; min-height:44px}
       .chip:active{transform:translateY(2px)}
       .chip.primary{border-color:transparent;background:linear-gradient(180deg, var(--primary) 0%, var(--primary-strong) 100%); color:#fff; box-shadow:0 6px 14px rgba(161,130,145,.35), inset 0 2px 0 rgba(255,255,255,.20)}
 
-      /* ===== Board（空状態イラスト対応） ===== */
       .board{margin:4px 22px 22px; height:280px; border-radius:18px; background:
         linear-gradient(180deg, rgba(255,255,255,.9), rgba(255,255,255,.7)),
         repeating-linear-gradient(0deg, rgba(65,61,75,.08) 0 1px, transparent 1px 48px),
@@ -119,41 +113,25 @@
       .empty{display:grid; place-items:center; gap:10px}
       .hidden{display:none !important}
 
-      /* ===== Toast（テキストのみ） ===== */
       .toast{position:fixed; left:50%; bottom:calc(22px + var(--safe-bottom)); transform:translateX(-50%); background:linear-gradient(180deg, #fff, rgba(255,255,255,.92)); border:1px solid rgba(65,61,75,.10); color:var(--ink); font-weight:800; padding:10px 14px; border-radius:999px; box-shadow:var(--shadow-sm); z-index:1200}
 
-      /* ===== Modal ===== */
       .modal-bg{position:fixed; inset:0; z-index:1100; display:grid; place-items:center; background:rgba(65,61,75,.18)}
       .modal{width:min(440px, 92vw); background:linear-gradient(180deg, #fff, rgba(255,255,255,.94)); border:1px solid rgba(65,61,75,.12); border-radius:18px; padding:18px; box-shadow:var(--shadow-lg)}
       .modal h3{margin:0 0 10px 0} .field{margin:10px 0} .field label{font-size:12px; color:var(--ink-weak)}
       .field input{width:100%; padding:12px 14px; border-radius:12px; border:1px solid rgba(65,61,75,.18); background:rgba(255,255,255,.8); color:var(--ink)}
       .right{display:flex; gap:10px; justify-content:flex-end; margin-top:12px}
 
-      /* ===== Loader overlay ===== */
       .loader{position:fixed; inset:0; background:rgba(246,244,242,.75); display:grid; place-items:center; z-index:1400}
       .loader-box{display:grid; place-items:center; gap:10px; padding:18px; border-radius:16px; background:linear-gradient(180deg,#fff,rgba(255,255,255,.92)); border:1px solid rgba(65,61,75,.12); box-shadow:var(--shadow-sm)}
       .ring{width:38px;height:38px;border:3px solid rgba(65,61,75,.15); border-top-color:var(--primary); border-radius:50%; animation:spin 1s linear infinite}
       @keyframes spin{to{transform:rotate(360deg)}}
 
-      /* ===== Mobile ===== */
       @media (max-width:900px){ .hero{grid-template-columns:1fr; gap:10px} .hero-right{order:-1} }
-      @media (max-width:720px){
-        .grid{grid-template-columns:1fr; gap:10px}
-        .actions{display:none} /* PCのみ。モバイルは下部バーへ集約 */
-      }
+      @media (max-width:720px){ .grid{grid-template-columns:1fr; gap:10px} .actions{display:none} }
       .mbar{position:fixed; left:0; right:0; bottom:0; padding:8px 10px calc(8px + var(--safe-bottom)); background:linear-gradient(180deg, rgba(255,255,255,.9), rgba(255,255,255,.98)); border-top:1px solid rgba(65,61,75,.10); display:none; gap:10px; justify-content:center; z-index:1200; backdrop-filter:blur(8px)}
       .mbar .mbtn{flex:1; min-height:48px; border-radius:14px; font-weight:900; letter-spacing:.2px; touch-action:manipulation; border:1px solid rgba(65,61,75,.18); background:#fff; color:var(--ink)}
       .mbar .mbtn.primary{border:none; background:linear-gradient(180deg, var(--primary) 0%, var(--primary-strong) 100%); color:#fff; box-shadow:0 6px 14px rgba(161,130,145,.30), inset 0 2px 0 rgba(255,255,255,.20)}
       @media (max-width:720px){ .mbar{display:flex} }
-
-      /* gentle enters */
-      @media (prefers-reduced-motion: no-preference){
-        .hero-left,.card,.board{animation:floatUp .28s ease both}
-        @keyframes floatUp{from{opacity:0; transform:translateY(4px)} to{opacity:1; transform:translateY(0)}}
-      }
-      @media (prefers-reduced-motion: reduce){
-        #hbHero.idle #hb_body, #hbHero.blink #hb_eyes, #hbHero.play #hb_body, #hbHero.play #hb_armR, #hbHero.play #hb_scarf { animation:none !important; }
-      }
     </style>
   </head>
   <body>
@@ -165,19 +143,15 @@
     </div>
 
     <div class="app" role="application" aria-label="時給ハッカー コックピット">
-      <!-- Header -->
       <div class="header">
         <div class="logo" aria-hidden="true"></div>
-        <div>
-          <div class="ttl">時給ハッカー</div>
-          <div class="sub">創造的で、上質な「頼れるパートナー」</div>
-        </div>
+        <div><div class="ttl">時給ハッカー</div><div class="sub">創造的で、上質な「頼れるパートナー」</div></div>
         <div class="spacer"></div>
         <button id="signinBtn" class="btn">Googleでログイン</button>
         <button id="signoutBtn" class="ghost hidden">ログアウト</button>
       </div>
 
-      <!-- Hero with big HACOBIT -->
+      <!-- Hero -->
       <section class="hero" aria-label="ヒーロー">
         <div class="hero-left">
           <h1>HACOBIT が相棒。今日は軽やかにいこう。</h1>
@@ -185,25 +159,10 @@
         </div>
         <div class="hero-right">
           <div id="heroWrap" class="hero-wrap">
-            <!-- sparkles (12個) -->
-            <div class="sparkles" aria-hidden="true">
-              <!-- 位置はCSS変数で飛ばす -->
-              <span style="left:50%;top:8%; --dx:-40px; --dy:-40px"></span>
-              <span style="left:18%;top:22%; --dx:-30px; --dy:-20px"></span>
-              <span style="left:82%;top:28%; --dx:30px; --dy:-24px"></span>
-              <span style="left:12%;top:54%; --dx:-26px; --dy:6px"></span>
-              <span style="left:88%;top:58%; --dx:26px; --dy:10px"></span>
-              <span style="left:28%;top:82%; --dx:-8px; --dy:26px"></span>
-              <span style="left:72%;top:82%; --dx:8px; --dy:26px"></span>
-              <span style="left:48%;top:92%; --dx:0; --dy:30px"></span>
-              <span style="left:6%;top:36%; --dx:-18px; --dy:-6px"></span>
-              <span style="left:94%;top:36%; --dx:18px; --dy:-6px"></span>
-              <span style="left:34%;top:10%; --dx:-14px; --dy:-24px"></span>
-              <span style="left:66%;top:10%; --dx:14px; --dy:-24px"></span>
-            </div>
-
-            <!-- HACOBIT inline SVG -->
-            <svg id="hbHero" class="hb-svg idle" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="HACOBIT">
+            <!-- ここに Canva の画像を置く。/public/assets/hacobit-hero.png を推奨 -->
+            <img id="hbImage" class="hb-img img-idle" src="/assets/hacobit-hero.png" alt="HACOBIT" />
+            <!-- フォールバックSVG（画像が無い/読み込めないとき表示） -->
+            <svg id="hbHero" class="hb-svg idle hidden" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="HACOBIT (fallback)">
               <defs>
                 <filter id="hbShadow" x="-50%" y="-50%" width="200%" height="200%">
                   <feOffset dx="0" dy="1.5" in="SourceAlpha" result="off"/>
@@ -213,64 +172,44 @@
                 </filter>
               </defs>
               <g id="hb_group" filter="url(#hbShadow)" stroke="#413D4B" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                <!-- body -->
-                <g id="hb_body">
-                  <rect x="176" y="180" rx="24" ry="24" width="160" height="160" fill="#F6F4F2"/>
-                  <!-- left arm -->
-                  <path d="M176 230 C 150 240, 150 280, 176 292" fill="none"/>
-                </g>
-                <!-- right arm -->
-                <g id="hb_armR">
-                  <path d="M336 230 C 362 240, 362 280, 336 292" fill="none"/>
-                </g>
-                <!-- scarf -->
-                <g id="hb_scarf">
-                  <path d="M256 300 C 276 296, 296 296, 312 302" fill="none" stroke="#A18291"/>
-                  <path d="M312 302 C 318 305, 320 312, 314 318" fill="none" stroke="#B58A6C"/>
-                </g>
-                <!-- face -->
-                <g id="hb_eyes">
-                  <circle cx="228" cy="240" r="6" fill="#413D4B"/>
-                  <circle cx="284" cy="240" r="6" fill="#413D4B"/>
-                  <path d="M230 265 h20" stroke="#413D4B"/>
-                </g>
+                <g id="hb_body"><rect x="176" y="180" rx="24" ry="24" width="160" height="160" fill="#F6F4F2"/><path d="M176 230 C 150 240, 150 280, 176 292" fill="none"/></g>
+                <g id="hb_armR"><path d="M336 230 C 362 240, 362 280, 336 292" fill="none"/></g>
+                <g id="hb_scarf"><path d="M256 300 C 276 296, 296 296, 312 302" fill="none" stroke="#A18291"/><path d="M312 302 C 318 305, 320 312, 314 318" fill="none" stroke="#B58A6C"/></g>
+                <g id="hb_eyes"><circle cx="228" cy="240" r="6" fill="#413D4B"/><circle cx="284" cy="240" r="6" fill="#413D4B"/><path d="M230 265 h20" stroke="#413D4B"/></g>
                 <rect x="248" y="332" width="16" height="12" rx="2" fill="#B58A6C"/>
               </g>
             </svg>
+
+            <!-- ブロンズきらめき（12発） -->
+            <div class="sparkles" aria-hidden="true">
+              <span style="left:50%;top:8%; --dx:-40px; --dy:-40px"></span><span style="left:18%;top:22%; --dx:-30px; --dy:-20px"></span><span style="left:82%;top:28%; --dx:30px; --dy:-24px"></span>
+              <span style="left:12%;top:54%; --dx:-26px; --dy:6px"></span><span style="left:88%;top:58%; --dx:26px; --dy:10px"></span>
+              <span style="left:28%;top:82%; --dx:-8px; --dy:26px"></span><span style="left:72%;top:82%; --dx:8px; --dy:26px"></span><span style="left:48%;top:92%; --dx:0; --dy:30px"></span>
+              <span style="left:6%;top:36%; --dx:-18px; --dy:-6px"></span><span style="left:94%;top:36%; --dx:18px; --dy:-6px"></span><span style="left:34%;top:10%; --dx:-14px; --dy:-24px"></span><span style="left:66%;top:10%; --dx:14px; --dy:-24px"></span>
+            </div>
           </div>
         </div>
       </section>
 
-      <!-- Profile -->
       <div id="authed" class="profile hidden">
         <img id="avatar" class="avatar" alt="ユーザーのアバター" src="">
-        <div class="grow">
-          <div id="username" style="font-weight:900"></div>
-          <div id="email" class="sub"></div>
-        </div>
-        <span class="tag" title="保存コレクション">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 12h14M12 5v14" stroke="#B58A6C" stroke-width="2" stroke-linecap="round"/></svg>
-          users/{uid}/work_sessions
-        </span>
+        <div class="grow"><div id="username" style="font-weight:900"></div><div id="email" class="sub"></div></div>
+        <span class="tag" title="保存コレクション"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 12h14M12 5v14" stroke="#B58A6C" stroke-width="2" stroke-linecap="round"/></svg>users/{uid}/work_sessions</span>
       </div>
 
-      <!-- Dashboard -->
       <div class="grid" aria-live="polite">
         <div class="card"><div class="label">推定時給（今日）</div><div id="wage" class="value">¥0</div></div>
         <div class="card"><div class="label">今日の件数</div><div id="orders" class="value">0</div></div>
         <div class="card"><div class="label">稼働時間（今日）</div><div id="time" class="value">0:00</div></div>
       </div>
 
-      <!-- Actions (PC) -->
       <div class="actions">
         <button id="startBtn" class="chip primary">開始する</button>
         <button id="pauseBtn" class="chip">一時停止</button>
         <button id="stopBtn" class="chip">終了して記録</button>
-        <div class="spacer"></div>
-        <span class="micro">クエストは準備中</span>
+        <div class="spacer"></div><span class="micro">クエストは準備中</span>
       </div>
 
-      <!-- Board（空状態をHACOBITで表示） -->
       <div class="board">
         <div id="empty" class="empty hidden">
           <svg width="72" height="72" viewBox="0 0 72 72" fill="none" aria-hidden="true">
@@ -286,14 +225,12 @@
       </div>
     </div>
 
-    <!-- Mobile bottom action bar -->
     <div class="mbar" role="toolbar" aria-label="操作バー（モバイル）">
       <button id="mStart" class="mbtn primary">開始</button>
       <button id="mPause" class="mbtn">一時停止</button>
       <button id="mStop"  class="mbtn">終了</button>
     </div>
 
-    <!-- Toast -->
     <div id="toast" class="toast hidden" role="status" aria-live="polite">保存しました。今日もいい流れ！</div>
 
     <script type="module">
@@ -319,43 +256,50 @@
       const provider = new GoogleAuthProvider();
       const db = getFirestore(app);
 
-      /* ===== DOM utils ===== */
+      /* ===== DOM helpers ===== */
       const $ = (id)=>document.getElementById(id);
-      const show = (el)=>{ el.classList.remove("hidden"); el.setAttribute("aria-hidden","false"); };
-      const hide = (el)=>{ el.classList.add("hidden"); el.setAttribute("aria-hidden","true"); };
+      const on = (id,ev,fn)=>{ const el=$(id); if(el) el.addEventListener(ev,fn); }; // ← これで null でも落ちない
+      const show = (el)=>{ el?.classList.remove("hidden"); el?.setAttribute?.("aria-hidden","false"); };
+      const hide = (el)=>{ el?.classList.add("hidden"); el?.setAttribute?.("aria-hidden","true"); };
       const pad2=(n)=>String(n).padStart(2,"0");
       const fmtHMM=(sec)=>{const h=Math.floor(sec/3600),m=Math.floor((sec%3600)/60);return `${h}:${pad2(m)}`;}
 
-      /* ===== States ===== */
-      let signingIn=false,timerId=null,seconds=0,earned=0,orders=0,currentSessionRef=null,startedAtMs=null,unsubscribeToday=null,firstLoaded=false;
-
       /* ===== Mascot controls ===== */
-      const hb = $("hbHero");
       const heroWrap = $("heroWrap");
+      const hbImg = $("hbImage");
+      const hbSvg = $("hbHero");
+      // 画像が読み込めなければSVGに切替
+      hbImg?.addEventListener("error",()=>{ hbImg.classList.add("hidden"); hbSvg.classList.remove("hidden"); });
       function blinkLoop(){
         const next = 3500 + Math.random()*2500;
-        setTimeout(()=>{ hb.classList.add("blink"); void hb.offsetWidth; hb.classList.remove("blink"); blinkLoop(); }, next);
+        setTimeout(()=>{
+          if(!hbSvg.classList.contains("hidden")){ hbSvg.classList.add("blink"); void hbSvg.offsetWidth; hbSvg.classList.remove("blink"); }
+          // 画像版は口パーツないので軽い不透明度チラで“瞬き風”
+          else { hbImg.style.transition="opacity .12s linear"; hbImg.style.opacity=".85"; setTimeout(()=>hbImg.style.opacity="1",120); }
+          blinkLoop();
+        }, next);
       }
       blinkLoop();
       const celebrate = ()=>{
         heroWrap.classList.add("celebrate");
-        hb.classList.remove("play"); void hb.offsetWidth; hb.classList.add("play");
+        if(!hbSvg.classList.contains("hidden")){ hbSvg.classList.remove("play"); void hbSvg.offsetWidth; hbSvg.classList.add("play"); }
+        else { hbImg.classList.remove("img-play"); void hbImg.offsetWidth; hbImg.classList.add("img-play"); }
         setTimeout(()=> heroWrap.classList.remove("celebrate"), 1000);
       };
 
       /* ===== Toast helper ===== */
-      const toast = (msg)=>{ const t=$("toast"); t.textContent=msg; t.classList.remove("hidden"); setTimeout(()=>t.classList.add("hidden"), 1800); };
+      const toast = (msg)=>{ const t=$("toast"); t.textContent=msg; show(t); setTimeout(()=> hide(t), 1800); };
 
-      /* ===== Auth buttons ===== */
-      $("signinBtn").addEventListener("click", async ()=>{
+      /* ===== Auth ===== */
+      let signingIn=false,timerId=null,seconds=0,earned=0,orders=0,currentSessionRef=null,startedAtMs=null,unsubscribeToday=null,firstLoaded=false;
+      on("signinBtn","click", async ()=>{
         if(signingIn) return; signingIn=true; $("signinBtn").disabled=true;
         try{ await signInWithPopup(auth, provider); }
         catch(e){ const msg=String(e?.message||""); if(e?.code==="auth/popup-blocked"||msg.includes("Pending promise")) await signInWithRedirect(auth, provider); else alert("ログインに失敗しました: "+(e?.message||e)); }
         finally{ signingIn=false; $("signinBtn").disabled=false; }
       });
-      $("signoutBtn").addEventListener("click", async ()=>{ await signOut(auth); });
+      on("signoutBtn","click", async ()=>{ await signOut(auth); });
 
-      /* ===== Timer visual ===== */
       function tick(){ seconds+=5; $("time").textContent=fmtHMM(seconds); $("wage").textContent=`¥${(seconds? Math.round((earned/(seconds/3600))):0).toLocaleString()}`; $("orders").textContent=String(orders); }
 
       async function startSession(){
@@ -370,20 +314,19 @@
       function pauseSession(){ if(timerId){ clearInterval(timerId); timerId=null; toast("一時停止中。水分補給してね"); } }
       function requestEnd(){ if(!auth.currentUser){ alert("先にログインしてね"); return; } if(!currentSessionRef){ alert("まずは開始しよう"); return; } show($("endModal")); $("inputSales").focus(); }
 
-      /* PC & Mobile actions */
-      $("startBtn").addEventListener("click", startSession);
-      $("pauseBtn").addEventListener("click", pauseSession);
-      $("stopBtn").addEventListener("click", requestEnd);
-      $("mStart").addEventListener("click", startSession);
-      $("mPause").addEventListener("click", pauseSession);
-      $("mStop").addEventListener("click", requestEnd);
+      // PC & モバイル操作
+      on("startBtn","click", startSession);
+      on("pauseBtn","click", pauseSession);
+      on("stopBtn","click", requestEnd);
+      on("mStart","click", startSession);
+      on("mPause","click", pauseSession);
+      on("mStop","click", requestEnd);
 
-      /* ===== Modal ===== */
-      $("endModal").addEventListener("click",(e)=>{ if(e.target.id==="endModal") hide($("endModal")); });
+      // モーダル
+      on("endModal","click",(e)=>{ if(e.target.id==="endModal") hide($("endModal")); });
       document.addEventListener("keydown",(e)=>{ if(e.key==="Escape") hide($("endModal")); });
-      $("cancelSave").addEventListener("click",()=> hide($("endModal")));
-
-      $("confirmSave").addEventListener("click", async ()=>{
+      on("cancelSave","click",()=> hide($("endModal")));
+      on("confirmSave","click", async ()=>{
         if(!auth.currentUser){ hide($("endModal")); return; }
         if(!currentSessionRef){ hide($("endModal")); return; }
         const sales=Number($("inputSales").value||0), cnt=Number($("inputOrders").value||0);
@@ -402,7 +345,7 @@
         seconds=0; earned=0; orders=0; currentSessionRef=null; startedAtMs=null;
       });
 
-      /* ===== Realtime 'today' totals + empty state ===== */
+      // 今日の合計 + 空状態 + ローダー解除
       function startTodayListener(uid){
         if(unsubscribeToday){ unsubscribeToday(); unsubscribeToday=null; }
         const startOfDay=new Date(); startOfDay.setHours(0,0,0,0);
@@ -419,11 +362,11 @@
         },(err)=>{ console.error("today-snapshot",err); if(!firstLoaded){ firstLoaded=true; hide($("loader")); }});
       }
 
-      /* ===== onAuth ===== */
       onAuthStateChanged(auth,(user)=>{
         if(user){
           $("username").textContent=user.displayName || "配達員さん"; $("email").textContent=user.email || ""; $("avatar").src=user.photoURL || "";
-          show($("authed")); show($("signoutBtn")); hide($("signinBtn")); startTodayListener(user.uid);
+          show($("authed")); show($("signoutBtn")); hide($("signinBtn"));
+          startTodayListener(user.uid);
         }else{
           hide($("authed")); hide($("signoutBtn")); show($("signinBtn"));
           if(unsubscribeToday){ unsubscribeToday(); unsubscribeToday=null; }
@@ -434,6 +377,9 @@
           if(!firstLoaded){ firstLoaded=true; hide($("loader")); }
         }
       });
+
+      // 念のためのフェイルセーフ：2.5秒でローダー強制解除
+      setTimeout(()=>{ const l=$("loader"); if(l && !l.classList.contains("hidden")) hide(l); }, 2500);
     </script>
   </body>
 </html>
