@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>時給ハッカー | コックピット（保存対応）</title>
+    <title>時給ハッカー | コックピット（保存＋今日の集計）</title>
     <style>
       /* ---- Warm Cozy Theme ----
          Base:  #F7EFE7 （あたたかいアイボリー, 面積 61.8%）
@@ -25,7 +25,6 @@
       body{
         margin:0; font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans JP", sans-serif;
         color:var(--ink);
-        /* 黄金比のベース:アクセントベール（61.8%:38.2%） */
         background:
           linear-gradient(135deg,
             var(--base) 0,
@@ -92,8 +91,7 @@
         position:fixed; inset:0; background:rgba(0,0,0,.2);
         display:grid; place-items:center; z-index:1000;
       }
-      /* ✅ hiddenを必ず勝たせる（前のルールを上書き） */
-      .modal-bg.hidden{ display:none !important; }
+      .modal-bg.hidden{ display:none !important; } /* ← 隠すを必ず勝たせる */
       .modal{
         background:#fff; color:var(--ink); border-radius:14px;
         width:min(420px, 92vw); padding:18px; box-shadow:var(--shadow)
@@ -103,6 +101,15 @@
       .field label{font-size:12px; color:var(--muted)}
       .field input{width:100%; padding:10px 12px; border:1px solid rgba(47,42,38,.2); border-radius:10px; font-size:14px}
       .right{display:flex; gap:10px; justify-content:flex-end; margin-top:12px}
+
+      /* ---- トースト ---- */
+      .toast{
+        position:fixed; left:50%; bottom:26px; transform:translateX(-50%);
+        background:#fff; border:1px solid rgba(47,42,38,.12);
+        padding:10px 14px; border-radius:999px; box-shadow:var(--shadow);
+        color:var(--ink); font-weight:700; z-index:1100
+      }
+      .hidden{display:none}
     </style>
   </head>
   <body>
@@ -110,7 +117,7 @@
       <div class="row">
         <div class="grow">
           <h1>時給ハッカー — コックピット</h1>
-          <div class="muted">Googleでログイン→開始/終了で「本物の保存」。地図は後続で統合。</div>
+          <div class="muted">Googleでログイン→開始/終了で「本物の保存」。保存後は“今日の合計”に反映します。</div>
         </div>
         <div>
           <button id="signinBtn">Googleでログイン</button>
@@ -125,13 +132,13 @@
             <div id="username" style="font-weight:800"></div>
             <div class="muted" id="email"></div>
           </div>
-          <span class="tag">保存先：users/{uid}/work_sessions</span>
+          <span class="tag">保存先：users/{uid}/work_sessions（今日の集計を表示）</span>
         </div>
 
         <div class="grid">
-          <div class="stat"><div class="label">現在の時給（推定）</div><div class="val" id="wage">¥0</div></div>
+          <div class="stat"><div class="label">推定時給（今日）</div><div class="val" id="wage">¥0</div></div>
           <div class="stat"><div class="label">今日の件数</div><div class="val" id="orders">0</div></div>
-          <div class="stat"><div class="label">稼働時間</div><div class="val" id="time">0:00</div></div>
+          <div class="stat"><div class="label">稼働時間（今日）</div><div class="val" id="time">0:00</div></div>
         </div>
 
         <div class="rowbtn">
@@ -169,6 +176,9 @@
       </div>
     </div>
 
+    <!-- 保存トースト -->
+    <div id="toast" class="toast hidden">保存しました ✅</div>
+
     <!-- Firebase (Modules via CDN) -->
     <script type="module">
       // --- Firebase 設定（あなたの値をそのまま使用） ---
@@ -196,7 +206,8 @@
         signOut
       } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
       import {
-        getFirestore, collection, addDoc, updateDoc, serverTimestamp
+        getFirestore, collection, addDoc, updateDoc, serverTimestamp,
+        query, where, orderBy, limit, onSnapshot, Timestamp
       } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
       import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-analytics.js";
 
@@ -204,7 +215,7 @@
       const app = initializeApp(firebaseConfig);
       try { getAnalytics(app); } catch (_) {}
 
-      // Auth を明示初期化（永続化＋Popup Resolver 安定化）
+      // Auth（明示初期化）
       const auth = initializeAuth(app, {
         persistence: [indexedDBLocalPersistence, browserLocalPersistence],
         popupRedirectResolver: browserPopupRedirectResolver
@@ -220,15 +231,25 @@
       const show= (el)=>{ el.classList.remove("hidden"); el.setAttribute("aria-hidden","false"); };
       const hide= (el)=>{ el.classList.add("hidden");    el.setAttribute("aria-hidden","true");  };
 
-      // 初期状態でモーダルは必ず閉じる（CSS競合の再保険）
+      // 初期状態でモーダルは必ず閉じる
       hide($("endModal"));
+
+      // ユーティリティ
+      const pad2 = (n)=>String(n).padStart(2,"0");
+      const fmtHMM = (sec)=>{
+        const h = Math.floor(sec/3600);
+        const m = Math.floor((sec%3600)/60);
+        return `${h>0? h+":" : ""}${h>0? pad2(m): m.toString().padStart(1,"0")}:${pad2(Math.floor(sec%60))}`.replace(/^0:/,"0:");
+      };
 
       // UI状態
       let signingIn = false;
       let timerId = null, seconds = 0, earned = 0, orders = 0;
-      let currentSessionRef = null;  // FirestoreのDoc参照
+      let currentSessionRef = null;  // Firestore Doc参照
       let startedAtMs = null;        // クライアント計測用
+      let unsubscribeToday = null;   // 今日の集計リスナー
 
+      // クリック連打ガード＋Redirectフォールバック
       $("signinBtn").addEventListener("click", async ()=>{
         if (signingIn) return;
         signingIn = true; $("signinBtn").disabled = true; $("signinBtn").style.opacity = ".7";
@@ -250,7 +271,7 @@
       // タイマー（見た目の推定）
       function tick(){
         seconds += 5; // デモ用 5秒刻み
-        $("time").textContent = `${Math.floor(seconds/60)}:${String(seconds%60).padStart(2,"0")}`;
+        $("time").textContent = fmtHMM(seconds);
         $("wage").textContent = `¥${(seconds? Math.round((earned/(seconds/3600))) : 0).toLocaleString()}`;
         $("orders").textContent = String(orders);
       }
@@ -311,9 +332,6 @@
         }
 
         earned = sales; orders = cnt;
-        // 見た目を即更新
-        $("orders").textContent = String(orders);
-        $("wage").textContent = `¥${(seconds? Math.round((earned/(seconds/3600))) : 0).toLocaleString()}`;
 
         // Firestore 更新
         const durationSec = Math.max(1, Math.round((Date.now() - (startedAtMs||Date.now()))/1000));
@@ -335,26 +353,61 @@
           return;
         }finally{
           hide($("endModal"));
+          // トースト表示
+          const t = $("toast"); t.classList.remove("hidden");
+          setTimeout(()=> t.classList.add("hidden"), 1800);
         }
 
-        // 片付け
+        // 片付け（見た目のカウンタは“今日の集計”に任せる）
         if (timerId){ clearInterval(timerId); timerId=null; }
         seconds = 0; earned = 0; orders = 0;
         currentSessionRef = null; startedAtMs = null;
-        $("time").textContent="0:00"; $("wage").textContent="¥0"; $("orders").textContent="0";
       });
+
+      // ---- 今日の集計（リアルタイム） ----
+      function startTodayListener(uid){
+        // すでに購読中なら解除
+        if (unsubscribeToday){ unsubscribeToday(); unsubscribeToday = null; }
+
+        const startOfDay = new Date();
+        startOfDay.setHours(0,0,0,0);
+        const startTs = Timestamp.fromDate(startOfDay);
+
+        // 端末差やインデックス不要のため、まずは「status=ended の最近50件」を購読 → クライアントで“今日”にフィルタ
+        const col = collection(db, "users", uid, "work_sessions");
+        const q = query(col, where("status","==","ended"), orderBy("startTime","desc"), limit(50));
+
+        unsubscribeToday = onSnapshot(q, (snap)=>{
+          let totalSales = 0, totalOrders = 0, totalSec = 0;
+          snap.forEach(doc=>{
+            const d = doc.data();
+            if (!d.startTime) return;
+            if (d.startTime.toMillis() < startTs.toMillis()) return; // 今日以前は除外
+            totalSales  += Number(d.grossSales || 0);
+            totalOrders += Number(d.ordersCount || 0);
+            totalSec    += Number(d.durationSec || 0);
+          });
+          const hourly = totalSec>0 ? Math.round(totalSales / (totalSec/3600)) : 0;
+          $("wage").textContent   = `¥${hourly.toLocaleString()}`;
+          $("orders").textContent = String(totalOrders);
+          const h = Math.floor(totalSec/3600), m = Math.floor((totalSec%3600)/60);
+          $("time").textContent   = `${h}:${String(m).padStart(2,"0")}`;
+        }, (err)=>{
+          console.error("today onSnapshot error:", err);
+        });
+      }
 
       onAuthStateChanged(auth, (user)=>{
         if (user){
           $("username").textContent = user.displayName || "配達員さん";
           $("email").textContent    = user.email || "";
           $("avatar").src           = user.photoURL || "";
-          document.querySelectorAll("#signinBtn,#signoutBtn").forEach(el=>el.classList.remove("hidden"));
           show($("authed")); show($("signoutBtn")); hide($("signinBtn")); hide($("unauthed"));
+          startTodayListener(user.uid);
         } else {
           hide($("endModal")); // ログアウト時はモーダルも必ず閉じる
           hide($("authed")); hide($("signoutBtn")); show($("signinBtn")); show($("unauthed"));
-          // セッション中断
+          if (unsubscribeToday){ unsubscribeToday(); unsubscribeToday = null; }
           if (timerId){ clearInterval(timerId); timerId=null; }
           seconds=0; earned=0; orders=0; startedAtMs=null; currentSessionRef=null;
           $("time").textContent="0:00"; $("wage").textContent="¥0"; $("orders").textContent="0";
