@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-    <title>時給ハッカー | Atelier White & Mauve + HACOBIT Hero</title>
+    <title>時給ハッカー | HACOBIT Hero (no-error safe)</title>
     <meta name="color-scheme" content="light only" />
     <style>
       :root{
@@ -89,7 +89,6 @@
       #hbHero.play #hb_scarf{transform-origin: 256px 300px; animation:hb_scarf_follow .16s .20s cubic-bezier(.34,1.56,.64,1) both}
       @keyframes hb_scarf_follow{0%{transform:rotate(0deg)}70%{transform:rotate(6deg)}100%{transform:rotate(-3deg)}}
 
-      /* ===== Dashboard他 ===== */
       .profile{display:flex; align-items:center; gap:12px; padding:0 22px 12px}
       .avatar{width:44px;height:44px;border-radius:50%;border:1px solid rgba(65,61,75,.15)}
       .tag{display:inline-flex;align-items:center;gap:8px;border:1px solid rgba(181,138,108,.45);background:rgba(181,138,108,.12);color:var(--accent);border-radius:999px;padding:6px 10px;font-weight:700;font-size:12px}
@@ -115,16 +114,14 @@
 
       .toast{position:fixed; left:50%; bottom:calc(22px + var(--safe-bottom)); transform:translateX(-50%); background:linear-gradient(180deg, #fff, rgba(255,255,255,.92)); border:1px solid rgba(65,61,75,.10); color:var(--ink); font-weight:800; padding:10px 14px; border-radius:999px; box-shadow:var(--shadow-sm); z-index:1200}
 
-      .modal-bg{position:fixed; inset:0; z-index:1100; display:grid; place-items:center; background:rgba(65,61,75,.18)}
-      .modal{width:min(440px, 92vw); background:linear-gradient(180deg, #fff, rgba(255,255,255,.94)); border:1px solid rgba(65,61,75,.12); border-radius:18px; padding:18px; box-shadow:var(--shadow-lg)}
-      .modal h3{margin:0 0 10px 0} .field{margin:10px 0} .field label{font-size:12px; color:var(--ink-weak)}
-      .field input{width:100%; padding:12px 14px; border-radius:12px; border:1px solid rgba(65,61,75,.18); background:rgba(255,255,255,.8); color:var(--ink)}
-      .right{display:flex; gap:10px; justify-content:flex-end; margin-top:12px}
-
+      /* ===== Loader ===== */
       .loader{position:fixed; inset:0; background:rgba(246,244,242,.75); display:grid; place-items:center; z-index:1400}
       .loader-box{display:grid; place-items:center; gap:10px; padding:18px; border-radius:16px; background:linear-gradient(180deg,#fff,rgba(255,255,255,.92)); border:1px solid rgba(65,61,75,.12); box-shadow:var(--shadow-sm)}
       .ring{width:38px;height:38px;border:3px solid rgba(65,61,75,.15); border-top-color:var(--primary); border-radius:50%; animation:spin 1s linear infinite}
       @keyframes spin{to{transform:rotate(360deg)}}
+      /* スプライト（8フレーム横並びを想定） */
+      .sprite{width:128px;height:128px;background-repeat:no-repeat;background-size:800% 100%; image-rendering:-webkit-optimize-contrast; image-rendering:pixelated}
+      @keyframes spritePlay{ from{background-position:0% 0} to{background-position:100% 0} }
 
       @media (max-width:900px){ .hero{grid-template-columns:1fr; gap:10px} .hero-right{order:-1} }
       @media (max-width:720px){ .grid{grid-template-columns:1fr; gap:10px} .actions{display:none} }
@@ -135,9 +132,10 @@
     </style>
   </head>
   <body>
+    <!-- Loader -->
     <div id="loader" class="loader">
       <div class="loader-box">
-        <div class="ring" aria-hidden="true"></div>
+        <div id="loaderAnim" class="ring" aria-hidden="true"></div>
         <div style="font-weight:800;color:var(--ink)">読み込み中…少し待ってね。</div>
       </div>
     </div>
@@ -159,10 +157,10 @@
         </div>
         <div class="hero-right">
           <div id="heroWrap" class="hero-wrap">
-            <!-- ここに Canva の画像を置く。/public/assets/hacobit-hero.png を推奨 -->
-            <img id="hbImage" class="hb-img img-idle" src="/assets/hacobit-hero.png" alt="HACOBIT" />
-            <!-- フォールバックSVG（画像が無い/読み込めないとき表示） -->
-            <svg id="hbHero" class="hb-svg idle hidden" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="HACOBIT (fallback)">
+            <!-- Canva画像（存在すれば動的に差す）。デフォは非表示 -->
+            <img id="hbImage" class="hb-img img-idle hidden" alt="HACOBIT">
+            <!-- フォールバックSVG -->
+            <svg id="hbHero" class="hb-svg idle" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="HACOBIT (fallback)">
               <defs>
                 <filter id="hbShadow" x="-50%" y="-50%" width="200%" height="200%">
                   <feOffset dx="0" dy="1.5" in="SourceAlpha" result="off"/>
@@ -180,7 +178,7 @@
               </g>
             </svg>
 
-            <!-- ブロンズきらめき（12発） -->
+            <!-- きらめき -->
             <div class="sparkles" aria-hidden="true">
               <span style="left:50%;top:8%; --dx:-40px; --dy:-40px"></span><span style="left:18%;top:22%; --dx:-30px; --dy:-20px"></span><span style="left:82%;top:28%; --dx:30px; --dy:-24px"></span>
               <span style="left:12%;top:54%; --dx:-26px; --dy:6px"></span><span style="left:88%;top:58%; --dx:26px; --dy:10px"></span>
@@ -256,42 +254,74 @@
       const provider = new GoogleAuthProvider();
       const db = getFirestore(app);
 
-      /* ===== DOM helpers ===== */
+      /* ===== Utils ===== */
       const $ = (id)=>document.getElementById(id);
-      const on = (id,ev,fn)=>{ const el=$(id); if(el) el.addEventListener(ev,fn); }; // ← これで null でも落ちない
+      const on = (id,ev,fn)=>{ const el=$(id); if(el) el.addEventListener(ev,fn); };
       const show = (el)=>{ el?.classList.remove("hidden"); el?.setAttribute?.("aria-hidden","false"); };
       const hide = (el)=>{ el?.classList.add("hidden"); el?.setAttribute?.("aria-hidden","true"); };
       const pad2=(n)=>String(n).padStart(2,"0");
       const fmtHMM=(sec)=>{const h=Math.floor(sec/3600),m=Math.floor((sec%3600)/60);return `${h}:${pad2(m)}`;}
+      const assetExists = async (path)=>{ try{ const r=await fetch(path,{method:"HEAD",cache:"no-store"}); return r.ok; }catch{ return false; } };
 
-      /* ===== Mascot controls ===== */
-      const heroWrap = $("heroWrap");
-      const hbImg = $("hbImage");
-      const hbSvg = $("hbHero");
-      // 画像が読み込めなければSVGに切替
-      hbImg?.addEventListener("error",()=>{ hbImg.classList.add("hidden"); hbSvg.classList.remove("hidden"); });
-      function blinkLoop(){
+      /* ===== Hero mascot: use Canva image if present, else SVG ===== */
+      const heroWrap = $("heroWrap"), hbImg=$("hbImage"), hbSvg=$("hbHero");
+      (async ()=>{
+        const hasHero = await assetExists("/assets/hacobit-hero.png");
+        if(hasHero){
+          hbImg.src="/assets/hacobit-hero.png";
+          hide(hbSvg); show(hbImg);
+        }else{
+          hide(hbImg); show(hbSvg);
+        }
+      })();
+      // idle blink loop
+      (function blinkLoop(){
         const next = 3500 + Math.random()*2500;
         setTimeout(()=>{
           if(!hbSvg.classList.contains("hidden")){ hbSvg.classList.add("blink"); void hbSvg.offsetWidth; hbSvg.classList.remove("blink"); }
-          // 画像版は口パーツないので軽い不透明度チラで“瞬き風”
           else { hbImg.style.transition="opacity .12s linear"; hbImg.style.opacity=".85"; setTimeout(()=>hbImg.style.opacity="1",120); }
           blinkLoop();
         }, next);
-      }
-      blinkLoop();
+      })();
       const celebrate = ()=>{
         heroWrap.classList.add("celebrate");
-        if(!hbSvg.classList.contains("hidden")){ hbSvg.classList.remove("play"); void hbSvg.offsetWidth; hbSvg.classList.add("play"); }
+        if(hbSvg && !hbSvg.classList.contains("hidden")){ hbSvg.classList.remove("play"); void hbSvg.offsetWidth; hbSvg.classList.add("play"); }
         else { hbImg.classList.remove("img-play"); void hbImg.offsetWidth; hbImg.classList.add("img-play"); }
         setTimeout(()=> heroWrap.classList.remove("celebrate"), 1000);
       };
 
-      /* ===== Toast helper ===== */
+      /* ===== Loader animation: prefer Lottie → Sprite → Ring ===== */
+      const loader = $("loader");
+      const loaderAnim = $("loaderAnim");
+      (async ()=>{
+        // 1) Lottie JSON
+        if(await assetExists("/assets/hacobit-loading.json")){
+          // 動的ロード（UMD）。window.lottie に生える。
+          await new Promise((res,rej)=>{
+            const s=document.createElement("script");
+            s.src="https://cdnjs.cloudflare.com/ajax/libs/lottie-web/5.12.2/lottie.min.js"; s.onload=res; s.onerror=rej; document.head.appendChild(s);
+          }).catch(()=>{});
+          if(window.lottie){
+            const box=document.createElement("div"); box.id="lottieBox"; box.style.width="120px"; box.style.height="120px";
+            loaderAnim.replaceWith(box);
+            window.lottie.loadAnimation({container:box, renderer:"svg", loop:true, autoplay:true, path:"/assets/hacobit-loading.json"});
+          }
+        }
+        // 2) PNGスプライト（横8コマ）
+        else if(await assetExists("/assets/hacobit-loading.png")){
+          const sp=document.createElement("div"); sp.className="sprite"; sp.style.backgroundImage="url('/assets/hacobit-loading.png')";
+          sp.style.animation="spritePlay 1s steps(8) infinite";
+          loaderAnim.replaceWith(sp);
+        }
+        // 3) どちらも無ければ既定のリングをそのまま使う（エラーなし）
+      })();
+
+      /* ===== Toast ===== */
       const toast = (msg)=>{ const t=$("toast"); t.textContent=msg; show(t); setTimeout(()=> hide(t), 1800); };
 
-      /* ===== Auth ===== */
+      /* ===== App state ===== */
       let signingIn=false,timerId=null,seconds=0,earned=0,orders=0,currentSessionRef=null,startedAtMs=null,unsubscribeToday=null,firstLoaded=false;
+
       on("signinBtn","click", async ()=>{
         if(signingIn) return; signingIn=true; $("signinBtn").disabled=true;
         try{ await signInWithPopup(auth, provider); }
@@ -314,7 +344,6 @@
       function pauseSession(){ if(timerId){ clearInterval(timerId); timerId=null; toast("一時停止中。水分補給してね"); } }
       function requestEnd(){ if(!auth.currentUser){ alert("先にログインしてね"); return; } if(!currentSessionRef){ alert("まずは開始しよう"); return; } show($("endModal")); $("inputSales").focus(); }
 
-      // PC & モバイル操作
       on("startBtn","click", startSession);
       on("pauseBtn","click", pauseSession);
       on("stopBtn","click", requestEnd);
@@ -322,7 +351,6 @@
       on("mPause","click", pauseSession);
       on("mStop","click", requestEnd);
 
-      // モーダル
       on("endModal","click",(e)=>{ if(e.target.id==="endModal") hide($("endModal")); });
       document.addEventListener("keydown",(e)=>{ if(e.key==="Escape") hide($("endModal")); });
       on("cancelSave","click",()=> hide($("endModal")));
@@ -345,7 +373,6 @@
         seconds=0; earned=0; orders=0; currentSessionRef=null; startedAtMs=null;
       });
 
-      // 今日の合計 + 空状態 + ローダー解除
       function startTodayListener(uid){
         if(unsubscribeToday){ unsubscribeToday(); unsubscribeToday=null; }
         const startOfDay=new Date(); startOfDay.setHours(0,0,0,0);
@@ -358,8 +385,8 @@
           const hourly= totalSec>0 ? Math.round(totalSales/(totalSec/3600)) : 0;
           $("wage").textContent=`¥${hourly.toLocaleString()}`; $("orders").textContent=String(totalOrders); $("time").textContent=fmtHMM(totalSec);
           if(count===0){ show($("empty")); } else { hide($("empty")); }
-          if(!firstLoaded){ firstLoaded=true; hide($("loader")); }
-        },(err)=>{ console.error("today-snapshot",err); if(!firstLoaded){ firstLoaded=true; hide($("loader")); }});
+          if(!firstLoaded){ firstLoaded=true; hide(loader); }
+        },()=>{ if(!firstLoaded){ firstLoaded=true; hide(loader); }});
       }
 
       onAuthStateChanged(auth,(user)=>{
@@ -374,12 +401,12 @@
           seconds=0; earned=0; orders=0; currentSessionRef=null; startedAtMs=null;
           $("wage").textContent="¥0"; $("orders").textContent="0"; $("time").textContent="0:00";
           show($("empty"));
-          if(!firstLoaded){ firstLoaded=true; hide($("loader")); }
+          if(!firstLoaded){ firstLoaded=true; hide(loader); }
         }
       });
 
-      // 念のためのフェイルセーフ：2.5秒でローダー強制解除
-      setTimeout(()=>{ const l=$("loader"); if(l && !l.classList.contains("hidden")) hide(l); }, 2500);
+      // フェイルセーフ：2.5sでローダー強制解除（ネットワークが遅くても固まらない）
+      setTimeout(()=> hide(loader), 2500);
     </script>
   </body>
 </html>
